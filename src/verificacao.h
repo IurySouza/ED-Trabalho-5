@@ -37,4 +37,7 @@ double obterArea(Lista l);
 Ponto centroide(Lista l, double area);
 //Calcula a centroide de um poligono descrito por um lista da estrutura de Casos de covid, onde os vertices estão ordenados no sentido anti-horario;
 
+int strInList(Lista lista, char* info);
+//Verifica se existe uma string igual a info em uma lista de strings
+
 #endif

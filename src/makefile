@@ -19,7 +19,8 @@ CC_FLAGS=-W         \
          -ansi      \
          -pedantic  \
 		 -std=c99   \
-		 -fstack-protector-all 
+		 -fstack-protector-all \
+		 -g
 
 LINKER_FLAGS = -lm
 

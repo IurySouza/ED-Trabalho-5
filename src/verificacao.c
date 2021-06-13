@@ -83,3 +83,12 @@ Ponto centroide(Lista l, double area){
     y += (getY(i) + getY(j)) * getX(i) * getY(j) - getY(i) * getX(j);
     return createPoint(x/(6 * area), y/(6 * area));
 }
+
+int strInList(Lista lista, char* info){
+    for(No node = getFirst(lista); node != NULL; node = getNext(node)){
+        if(strcmp(getInfo(node), info) == 0){
+            return 1;
+        }
+    }
+    return 0;
+}
