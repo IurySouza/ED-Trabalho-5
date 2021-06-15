@@ -15,6 +15,7 @@
 #include "qry2.h"
 #include "qry3.h"
 #include "qry4.h"
+#include "qry5.h"
 #include "svg.h"
 #include "casos.h"
 #include "tabelaEspalhamento.h"
@@ -156,9 +157,13 @@ void qry(QuadTree qt[11], HashTable ht[4], char path[], char nomeSaida[]){
         exit(1);
     }
     Lista extraFig = createList();
+    Ponto reg[11];
+    for(int i = 0; i < 11; i++) {
+        reg[i] = createPoint(1, 1);
+    }
     int j,k,i;
     double x,y,h,w;
-    char face, tipo[7], cepid[20], aux[20], corb[22], corp[22], cpf[15];
+    char face, tipo[7], cepid[20], aux[20], corb[22], corp[22], cpf[15], r1[5], r2[5];
     while(fscanf(consulta,"%s",tipo) != EOF){
         if(strcmp(tipo,"o?") == 0){
             fscanf(consulta,"%s %s",cepid,aux);
@@ -285,6 +290,51 @@ void qry(QuadTree qt[11], HashTable ht[4], char path[], char nomeSaida[]){
             fscanf(consulta, "%lf %lf %lf", &x, &y, &w);
             fprintf(saida, "%s %lf %lf %lf\n", tipo, x, y, w);
             catac(svg, saida, qt, ht,x, y, w, extraFig);
+        }
+        else if(strcmp(tipo, "@m?") == 0) {
+            fscanf(consulta, "%s %s", r1, cpf);
+            fprintf(saida, "%s %s %s\n", tipo, r1, cpf);
+            m(svg, r1, cpf, reg[11], extraFig);
+        }
+        else if(strcmp(tipo, "@e?") == 0) {
+            fscanf(consulta, "%s %s %c %d", r1, cepid, &face, &j);
+            fprintf(saida, "%s %s %s %c %d\n", tipo, r1, cepid, face, j);
+            // e();
+        }
+        else if(strcmp(tipo, "@g?") == 0) {
+            fscanf(consulta, "%s %s", r1, cepid);
+            fprintf(saida, "%s %s %s\n", tipo, r1, cepid);
+            // g();
+        }
+        else if(strcmp(tipo, "@xy") == 0) {
+            fscanf(consulta, "%s %lf %lf", r1, &x, &y);
+            fprintf(saida, "%s %s %lf %lf\n", tipo, r1, x, y);
+            // xy();
+        }
+        else if(strcmp(tipo, "ccv") == 0) {
+            fscanf(consulta, "%s", aux);
+            fprintf(saida, "%s %s\n", tipo, aux);
+            // ccv();
+        }
+        else if(strcmp(tipo, "p?") == 0) {
+            fscanf(consulta, "%s %s %s %s %s", aux, r1, r2, corb, corp);
+            fprintf(saida, "%s %s %s %s %s %s\n", tipo, aux, r1, r2, corb, corp);
+            // p();
+        }
+        else if(strcmp(tipo, "bf") == 0) {
+            fscanf(consulta, "%s", r1);
+            fprintf(saida, "%s %s\n", tipo, r1);
+            // bf();
+        }
+        else if(strcmp(tipo, "sp?") == 0) {
+            fscanf(consulta, "%s %s %s %s %s", aux, r1, r2, corb, corp);
+            fprintf(saida, "%s %s %s %s %s %s\n", tipo, aux, r1, r2, corb, corp);
+            // sp();
+        }
+        else if(strcmp(tipo, "pb?") == 0) {
+            fscanf(consulta, "%s %s %s %s", aux, r1, r2, corb);
+            fprintf(saida, "%s %s %s %s %s\n", tipo, aux, r1, r2, corb);
+            // pb();
         }
     }
     desenharSvg(svg,qt,extraFig);

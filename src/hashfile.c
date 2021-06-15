@@ -22,7 +22,22 @@ typedef struct {
 } HashfileStruct;
 
 Hashfile fcreateHF(char *nome, int nbuckets, int numRecPerBkt, int tamRec, int tamCh) {
-    HashfileStruct *h = (HashfileStruct*) malloc(sizeof(HashfileStruct));
+    BucketStruct b;
+    b.nRec = 0;
+    b.posContinuacao = -1;
+
+    FILE* hf = fopen(nome, "wb");
+
+    for(int i = 0; i < nbuckets; i++) {
+        fwrite(&b, sizeof(BucketStruct), 1, hf);
+    }
+
+    BucketStruct aux;
+    fread(&aux, sizeof(BucketStruct), 1, hf);
+    printf("%d\n", aux.nRec);
+    fclose(hf);
+
+    /*HashfileStruct *h = (HashfileStruct*) malloc(sizeof(HashfileStruct));
     h->buckets = (BucketStruct*) malloc(nbuckets * sizeof(BucketStruct));
     strcpy(h->filename, nome);
     h->nbuckets = nbuckets;
@@ -42,9 +57,12 @@ Hashfile fcreateHF(char *nome, int nbuckets, int numRecPerBkt, int tamRec, int t
         return NULL;
     }
 
-    fwrite(h, sizeof(h), 1, f);
+    fwrite(h, sizeof(*h), 1, f);
+    HashfileStruct aux;
+    fread(&aux, sizeof(HashfileStruct), 1, f);
+    printf("%s\n", aux.filename);
     fclose(f);
-    return h;
+    return h;*/
 }
 
 /*int getKey(char *chave, int nbuckets) {
