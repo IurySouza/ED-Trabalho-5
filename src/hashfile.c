@@ -183,7 +183,10 @@ void dumpFileHF(Hashfile hf, Info F, PrintRecord p){
         long int aux = ftell(file);
         while(1){
             for(int j = 0; j < balde.nItens; j++){
-                p(balde.itens[j], F);
+                Item item = alocarItem(h->tamCh, h->tamRec);
+                strcpy(getChaveItem(item), getChaveItem(balde.itens[j]));
+                memcpy(getValorItem(item), getValorItem(balde.itens[j]), h->tamRec);
+                p(item, F);
             }
             if(balde.next == -1){
                 break;

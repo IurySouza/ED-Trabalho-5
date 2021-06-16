@@ -23,6 +23,7 @@
 #include "pessoa.h"
 #include "endereco.h"
 #include "hashfile.h"
+#include "leituraHash.h"
 
 char *obterNomeArquivo(char path[]){
     char *aux = strrchr(path,'/');
@@ -428,19 +429,16 @@ void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], c
     for (i = 0; i < 4; i++) {
         ht[i] = iniciaTabela(1117);
     }
-    Hashfile hf[4];
     geo(trees, ht, geoArq, saidaGeo);
     if(nomebase != NULL){
-        //ler hls
+        readHashfile(ht, trees[9], trees[10], nomebase);
     }
     else{
         if(paramEc != NULL){
             ec(trees, ht, ecArq);
-            free(ecArq);
         }
         if(paramPm != NULL){
             pm(trees, ht, pmArq);
-            free(pmArq);
         }
     }
     if (paramQry != NULL){
@@ -453,7 +451,13 @@ void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], c
     }
     if(nomeHash != NULL){
         hashFileName = obterNomeArquivo(nomeHash);
-        //escrever hfs
+        saveHashfile(ht, trees[9], trees[10], hashFileName);
+    }
+    if(paramEc != NULL){
+        free(ecArq);
+    }
+    if(paramPm != NULL){
+        free(pmArq);
     }
     free(geoArq);
     free(saida);

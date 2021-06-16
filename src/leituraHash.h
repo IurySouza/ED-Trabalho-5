@@ -6,10 +6,16 @@
 #include "tabelaEspalhamento.h"
 #include "hashfile.h"
 
-void ec(QuadTree qt[11], HashTable ht[4], char ecArq[]);
 //le o arquivo .ec e realiza suas funções, inclusive adicionando dados na tabela de espalhamento
+void ec(QuadTree qt[11], HashTable ht[4], char ecArq[]);
 
-void pm(QuadTree qt[11], HashTable ht[4], char pmArq[]);
 //le o arquivo .pm e realiza suas funções, inclusive adicionando dados na tabela de espalhamento
+void pm(QuadTree qt[11], HashTable ht[4], char pmArq[]);
+
+//salva o conteudo de uma hashfile
+void saveHashfile(HashTable ht[4], QuadTree estabelecimentos, QuadTree enderecos, char nomebase[]);
+
+//le o conteudo de uma hashfile
+void readHashfile(HashTable ht[4], QuadTree estabelecimentos, QuadTree enderecos, char nomebase[]);
 
 #endif

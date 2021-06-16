@@ -20,9 +20,6 @@ void setCpfEndereco(Endereco endereco, char cpf[]);
 char* getCpfEndereco(Endereco endereco);
 // retorna o valor de cpf
 
-void setPontoEndereco(Endereco endereco, Ponto p);
-// atualiza ponto
-
 Ponto getPontoEndereco(Endereco endereco);
 // retorna ponto
 
@@ -53,4 +50,12 @@ void desalocarEndereco(Endereco endereco);
 int getSizeEndereco();
 // retorna o tamanho da struct Endereco
 
+double getXEndereco(Endereco endereco);
+// retorna o valor de x
+
+double getYEndereco(Endereco endereco);
+// retorna o valor de y
+
+void setPontoEndereco(Endereco endereco, double x, double y);
+// retorna ponto
 #endif
