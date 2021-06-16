@@ -2,15 +2,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include "leituraHash.h"
-#include "quadra.h"
-#include "regiao.h"
 #include "lista.h"
 #include "sorts.h"
 #include "ponto.h"
-#include "casos.h"
 #include "Estabelecimento.h"
 #include "pessoa.h"
 #include "endereco.h"
+#include "item.h"
+
+void listToHashfile(Hashfile hf, Lista l){
+    for(No node = getFirst(l); node != NULL; node = getNext(node)){
+        fwriteRec(hf, getInfo(node));
+    }
+}
+
+void listToHashTable(HashTable ht, Lista l){
+    for(No node = getFirst(l); node != NULL; node = getNext(node)){
+        adicionaItem(ht, getChaveItem(getInfo(node)), getValorItem(getInfo(node)));
+    }
+}
 
 void ec(QuadTree qt[11], HashTable ht[4], char ecArq[]) {
     char codt[20], auxd[255], cpf[15], cnpj[19], cep[20], face, nome[30], tipo[2], *descricao;
@@ -81,4 +91,83 @@ void pm(QuadTree qt[11], HashTable ht[4], char pmArq[]) {
     removeList(list[0], NULL);
     removeList(list[1], NULL);
     fclose(pmFile);
+}
+
+void saveHashfile(HashTable ht[4], QuadTree estabelecimentos, QuadTree enderecos, char nomebase[]){
+    char fileEC[80], fileDes[80], fileP[80], fileEnd[80];
+    sprintf(fileEC,"%s-ec.dat", nomebase);
+    sprintf(fileDes,"%s-des.dat", nomebase);
+    sprintf(fileP,"%s-pes.dat", nomebase);
+    sprintf(fileEnd,"%s-end.dat", nomebase);
+    Hashfile hf[4];
+    hf[0] = fcreateHF(fileEC,107,10,getSizeEstabelecimento(),20);
+    hf[1] = fcreateHF(fileEnd,107,10,getSizeEndereco(),20);
+    hf[2] = fcreateHF(fileDes,107,10,255,20);
+    hf[3] = fcreateHF(fileP,107,10,getSizePessoa(),20);
+    Lista lAux[4], lEst = createList(), lEnd = createList();
+    for(int i = 0; i < 4; i++){
+        lAux[i] = createList();
+    }
+    percorreLarguraQt(estabelecimentos, listInsert, lEst);
+    for(No node = getFirst(lEst); node != NULL; node = getNext(node)) {
+        listInsert(createItem(getCnpjEstabelecimento(getInfo(node)), getInfo(node)), lAux[0]);
+    }
+    percorreLarguraQt(enderecos, listInsert, lEnd);
+    for(No node = getFirst(lEnd); node != NULL; node = getNext(node)) {
+        listInsert(createItem(getCpfEndereco(getInfo(node)), getInfo(node)), lAux[1]);
+    }
+    for(int i = 2; i < 4; i++){
+        percorrerTabela(ht[i - 1], listInsert, lAux[i]);
+    }
+    for(int i = 0; i < 4; i++){
+        if (i != 0) listToHashfile(hf[i], lAux[i]);
+        fcloseHF(hf[i]);
+    }
+    removeList(lEst, NULL);
+    removeList(lEnd, NULL);
+    removeList(lAux[0], desalocaItem);
+    removeList(lAux[1], desalocaItem);
+    removeList(lAux[2], NULL);
+    removeList(lAux[3], NULL);
+}
+
+void readHashfile(HashTable ht[4], QuadTree estabelecimentos, QuadTree enderecos, char nomebase[]){
+    char fileEC[80], fileDes[80], fileP[80], fileEnd[80];
+    sprintf(fileEC,"%s-ec.dat", nomebase);
+    sprintf(fileDes,"%s-des.dat", nomebase);
+    sprintf(fileP,"%s-pes.dat", nomebase);
+    sprintf(fileEnd,"%s-end.dat", nomebase);
+    Hashfile hf[4];
+    hf[0] = fopenHF(fileEC);
+    hf[1] = fopenHF(fileEnd);
+    hf[2] = fopenHF(fileDes);
+    hf[3] = fopenHF(fileP);
+    Lista lAux[4];
+    for(int i = 0; i < 4; i++){
+        lAux[i] = createList();
+    }
+    for(int i = 0; i < 4; i++){
+        dumpFileHF(hf[i], lAux[i], listInsert);
+        fcloseHF(hf[i]);
+    }
+    Lista end = createList(), est = createList();
+    for(No node = getFirst(lAux[1]); node != NULL; node = getNext(node)){
+        Endereco e = getValorItem(getInfo(node));
+        setPontoEndereco(e,getXEndereco(e),getYEndereco(e));
+        listInsert(e,end);
+    }
+    for(No node = getFirst(lAux[0]); node != NULL; node = getNext(node)){
+        Estabelecimento e = getValorItem(getInfo(node));
+        setPontoEstabelecimento(e,getXEstabelecimento(e), getYEstabelecimento(e));
+        listInsert(e,est);
+    }
+    balancearQuadTree(estabelecimentos, est, getPontoEstabelecimento, swapEstabelecimento);
+    balancearQuadTree(enderecos, end, getPontoEndereco, swapEndereco);
+    for(int i = 1; i < 4; i++){
+        listToHashTable(ht[i - 1], lAux[i]);
+        removeList(lAux[i], desalocaItem);
+    }
+    removeList(est, NULL);
+    removeList(end, NULL);
+    removeList(lAux[0], desalocaItem);
 }

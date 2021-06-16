@@ -16,7 +16,7 @@
 #include "tabelaEspalhamento.h"
 
 typedef void *Hashfile;
-typedef void (*PrintRecord)(void *, FILE *);
+typedef void (*PrintRecord)(void *, void *);
 
 Hashfile fcreateHF(char *nome,int nbuckets,int numRecPerBkt, int tamRec, int tamCh);
 /*

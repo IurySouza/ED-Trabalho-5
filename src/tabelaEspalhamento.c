@@ -98,3 +98,15 @@ void imprimeTabela(HashTable t) {
         }
     }
 }
+
+void percorrerTabela(HashTable t, void (*f)(void*, void*), Info extraInf){
+    HashTableStruct *h = (HashTableStruct*) t;
+    for (int i = 0; i < h->tamanho; i++) {
+        No aux = getFirst(h->tabela[i]);
+        while (aux != NULL) {
+            Item i = getInfo(aux);
+            f(i,extraInf);
+            aux = getNext(aux);
+        }
+    }
+}

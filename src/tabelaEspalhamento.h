@@ -40,4 +40,7 @@ void deletaTabela(HashTable t, int flag);
 /* Função para debug, imprime a tabela no console */
 void imprimeTabela(HashTable t);
 
+/* Função para percorrer a tabela aplicando a função f para cada item */
+void percorrerTabela(HashTable t, void (*f)(void*, void*), Info extraInf);
+
 #endif

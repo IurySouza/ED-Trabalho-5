@@ -41,4 +41,13 @@ void desalocarEstabelecimento(Estabelecimento estabelecimento);
 int getSizeEstabelecimento();
 // retorna o tamanho da struct Estabelecimento
 
+double getXEstabelecimento(Estabelecimento estabelecimento);
+// retorna o valor x da struct Estabelecimento
+
+double getYEstabelecimento(Estabelecimento estabelecimento);
+// retorna o valor y da struct Estabelecimento
+
+void setPontoEstabelecimento(Estabelecimento estabelecimento, double x, double y);
+// altera o ponto
+
 #endif

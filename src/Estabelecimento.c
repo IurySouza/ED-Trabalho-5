@@ -14,6 +14,8 @@ typedef struct{
     char codt[10];
     char face;
     int numero;
+    double x;
+    double y;
 }EstabelecimentoStruct;
 
 Estabelecimento createEstabelecimento(Quadra quad, char cnpj[], char cpf[], char nome[], char codt[], char face, int num){
@@ -46,6 +48,8 @@ Estabelecimento createEstabelecimento(Quadra quad, char cnpj[], char cpf[], char
     estabelecimento->ponto = createPoint(x,y);
     estabelecimento->face = face;
     estabelecimento->numero = num;
+    estabelecimento->x = x;
+    estabelecimento->y = y;
     return estabelecimento;
 }
 
@@ -104,4 +108,19 @@ void desalocarEstabelecimento(Estabelecimento estabelecimento){
 
 int getSizeEstabelecimento(){
     return sizeof(EstabelecimentoStruct);
+}
+
+double getXEstabelecimento(Estabelecimento estabelecimento){
+    EstabelecimentoStruct* e = (EstabelecimentoStruct*) estabelecimento;
+    return e->x;
+}
+
+double getYEstabelecimento(Estabelecimento estabelecimento){
+    EstabelecimentoStruct* e = (EstabelecimentoStruct*) estabelecimento;
+    return e->y;
+}
+
+void setPontoEstabelecimento(Estabelecimento estabelecimento, double x, double y){
+    EstabelecimentoStruct* e = (EstabelecimentoStruct*) estabelecimento;
+    e->ponto = createPoint(x,y);
 }

@@ -51,6 +51,9 @@ double getVmAresta(Aresta aresta){
 
 double getTempoAresta(Aresta aresta){
     StructAresta* a = (StructAresta*) aresta;
+    if(a->vm == 0){
+        return a->cmp;
+    }
     return a->cmp/a->vm;
 }
 
