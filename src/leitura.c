@@ -22,6 +22,7 @@
 #include "Estabelecimento.h"
 #include "pessoa.h"
 #include "endereco.h"
+#include "hashfile.h"
 
 char *obterNomeArquivo(char path[]){
     char *aux = strrchr(path,'/');
@@ -346,90 +347,17 @@ void qry(QuadTree qt[11], HashTable ht[4], char path[], char nomeSaida[]){
     removeList(extraFig,free);
 }
 
-void ec(QuadTree qt[11], HashTable ht[4], char ecArq[]) {
-    char codt[20], auxd[255], cpf[15], cnpj[19], cep[20], face, nome[30], tipo[2], *descricao;
-    int num;
-    Info info;
-    Lista list = createList();
-    FILE *ecFile = fopen(ecArq, "r");
-
-    if (ecFile == NULL) {
-        printf("\nERRO ao abrir o arquivo .ec\n");
-        exit(1);
-    }
-
-    while (fscanf(ecFile, "%s", tipo) != EOF) {
-        if(strcmp(tipo, "t") == 0) {
-            fscanf(ecFile, "%s", codt);
-            fgets(auxd, 255, ecFile);
-            descricao = (char*) malloc((strlen(auxd) + 1) * sizeof(char));
-            strcpy(descricao, auxd);
-            adicionaItem(ht[1], codt, descricao);
-        } else if(strcmp(tipo, "e") == 0) {
-            fscanf(ecFile, "%s %s %s %s %c %d %s", cnpj, cpf, codt, cep, &face, &num, nome);
-            info = getValor(ht[3], cep);
-            if (info != NULL) {
-                listInsert(createEstabelecimento(info, cnpj, cpf, nome, codt, face, num), list);
-            }
-        }
-    }
-
-    balancearQuadTree(qt[9], list, getPontoEstabelecimento, swapEstabelecimento);
-    removeList(list, NULL);
-    fclose(ecFile);
-}
-
-void pm(QuadTree qt[11], HashTable ht[4], char pmArq[]) {
-    char cpf[15], nome[20], sobrenome[20], sexo, nasc[11], cep[20], face, compl[10], tipo[2];
-    int num;
-    Info info;
-    Lista list[2];
-    list[0] = createList();
-    list[1] = createList();
-    FILE *pmFile = fopen(pmArq, "r");
-
-    if (pmFile == NULL) {
-        printf("ERRO ao abrir o arquivo .pm\n");
-        exit(1);
-    }
-
-    while (fscanf(pmFile, "%s", tipo) != EOF) {
-        if(strcmp(tipo, "p") == 0) {
-            fscanf(pmFile, "%s %s %s %c %s", cpf, nome, sobrenome, &sexo, nasc);
-            info = criarPessoa(cpf, nome, sobrenome, sexo, nasc);
-            adicionaItem(ht[2], cpf, info);
-        } else if(strcmp(tipo, "m") == 0) {
-            fscanf(pmFile, "%s %s %c %d %s", cpf, cep, &face, &num, compl);
-            info = getValor(ht[3], cep);
-            if (info != NULL){
-                info = createEndereco(info, cpf, face, num, compl);
-                listInsert(info, list[0]);
-                listInsert(info, list[1]);
-            }
-        }
-    }
-
-    balancearQuadTree(qt[10], list[0], getPontoEndereco, swapEndereco);
-    for(No node = getFirst(list[1]); node != NULL; node = getNext(node)) {
-        info = getInfo(node);
-        adicionaItem(ht[0], getCpfEndereco(info), info);
-    }
-    removeList(list[0], NULL);
-    removeList(list[1], NULL);
-    fclose(pmFile);
-}
-
-void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], char paramEc[], char paramPm[]){
+void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], char paramEc[], char paramPm[], char nomeHash[], char nomebase[]){
     char *geoArq = NULL;
     char *qryArq = NULL;
     char *ecArq = NULL;
     char *pmArq = NULL;
     char *nomeGeo = NULL;
     char *nomeQry = NULL;
-
     char *saida = NULL;
     char *saidaGeo = NULL;
     char *saidaQry = NULL;
+    char *hashFileName = NULL;
     int i;
     if (path != NULL) {
         if(path[strlen(path) - 1] != '/'){
@@ -500,14 +428,20 @@ void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], c
     for (i = 0; i < 4; i++) {
         ht[i] = iniciaTabela(1117);
     }
+    Hashfile hf[4];
     geo(trees, ht, geoArq, saidaGeo);
-    if(paramEc != NULL){
-        ec(trees, ht, ecArq);
-        free(ecArq);
+    if(nomebase != NULL){
+        //ler hls
     }
-    if(paramPm != NULL){
-        pm(trees, ht, pmArq);
-        free(pmArq);
+    else{
+        if(paramEc != NULL){
+            ec(trees, ht, ecArq);
+            free(ecArq);
+        }
+        if(paramPm != NULL){
+            pm(trees, ht, pmArq);
+            free(pmArq);
+        }
     }
     if (paramQry != NULL){
         nomeQry = obterNomeArquivo(paramQry);
@@ -516,6 +450,10 @@ void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], c
         qry(trees, ht, qryArq, saidaQry);
         free(saidaQry);
         free(qryArq); 
+    }
+    if(nomeHash != NULL){
+        hashFileName = obterNomeArquivo(nomeHash);
+        //escrever hfs
     }
     free(geoArq);
     free(saida);

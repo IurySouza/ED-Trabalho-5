@@ -21,4 +21,7 @@ char getSexo(Pessoa pessoa);
 char* getDataNascimento(Pessoa pessoa);
 // retorna a data de nascimento da pessoa
 
+int getSizePessoa();
+// retorna o tamanho da struct pessoa
+
 #endif

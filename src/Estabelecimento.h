@@ -38,4 +38,7 @@ void swapEstabelecimento(Estabelecimento e1, Estabelecimento e2);
 void desalocarEstabelecimento(Estabelecimento estabelecimento);
 // desaloca a memória utilizada para armazenar Estabelecimento
 
+int getSizeEstabelecimento();
+// retorna o tamanho da struct Estabelecimento
+
 #endif

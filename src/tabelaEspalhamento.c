@@ -9,18 +9,6 @@ typedef struct {
     int tamanho;
 } HashTableStruct;
 
-typedef struct {
-    char chave[25];
-    Item valor;
-} ItemStruct;
-
-void desalocaValor(Item item){
-    ItemStruct *i = (ItemStruct*) item;
-    free(i->valor);
-    free(i);
-}
-
-
 HashTable iniciaTabela(int tamanho) {
     HashTableStruct *h = (HashTableStruct*) malloc(sizeof(HashTableStruct));
 
@@ -49,22 +37,18 @@ int getChave(char chave[], int tamanhoHash) {
 void adicionaItem(HashTable t, char chave[], Item valor) {
     HashTableStruct *h = (HashTableStruct*) t;
     int hashKey = getChave(chave, h->tamanho);
-
-    ItemStruct *item = (ItemStruct*) malloc(sizeof(ItemStruct));
-    strcpy(item->chave, chave);
-    item->valor = valor;
-
+    Item item = createItem(chave,valor); 
     listInsert(item, h->tabela[hashKey]);
 }
 
 void deletaItem(HashTable t, char chave[], int flag) {
     HashTableStruct *h = (HashTableStruct*) t;
     int hashKey = getChave(chave, h->tamanho);
-    void (*desaloca[2])(Item) = {free, desalocaValor};
+    void (*desaloca[2])(Item) = {desalocaItem, desalocaValorItem};
 
     for (No aux = getFirst(h->tabela[hashKey]); aux != NULL; aux = getNext(aux)) {
-        ItemStruct *i = (ItemStruct*) getInfo(aux);
-        if (strcmp(i->chave, chave) == 0) {
+        Item i =  getInfo(aux);
+        if (strcmp(getChaveItem(i), chave) == 0) {
             removeNode(h->tabela[hashKey], aux, desaloca[flag]);
             return;
         }
@@ -76,9 +60,9 @@ Item getValor(HashTable t, char chave[]) {
     int hashKey = getChave(chave, h->tamanho);
 
     for (No aux = getFirst(h->tabela[hashKey]); aux != NULL; aux = getNext(aux)) {
-        ItemStruct *i = (ItemStruct*) getInfo(aux);
-        if (strcmp(i->chave, chave) == 0) {
-            return i->valor;
+        Item i = getInfo(aux);
+        if (strcmp(getChaveItem(i), chave) == 0) {
+            return getValorItem(i);
         }
     }
 
@@ -87,7 +71,7 @@ Item getValor(HashTable t, char chave[]) {
 
 void deletaTabela(HashTable t, int flag) {
     HashTableStruct *h = (HashTableStruct*) t;
-    void (*desaloca[2])(Item) = {free, desalocaValor};
+    void (*desaloca[2])(Item) = {desalocaItem, desalocaValorItem};
 
     for (int i = 0; i < h->tamanho; i++) {
         removeList(h->tabela[i], desaloca[flag]);
@@ -108,8 +92,8 @@ void imprimeTabela(HashTable t) {
     for (int i = 0; i < h->tamanho; i++) {
         No aux = getFirst(h->tabela[i]);
         while (aux != NULL) {
-            ItemStruct *i = (ItemStruct*) getInfo(aux);
-            printf("%s: %s\n", i->chave, (char*)getValor(h, i->chave));
+            Item i = getInfo(aux);
+            printf("%s: %s\n", getChaveItem(i), (char*)getValor(h, getChaveItem(i)));
             aux = getNext(aux);
         }
     }

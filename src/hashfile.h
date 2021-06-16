@@ -10,17 +10,15 @@
 
     Os registros são organizados  no arquivo segunda sua chave (única) e
     alfa-numérica.
-*/
+     */
 
 #include <stdio.h>
+#include "tabelaEspalhamento.h"
 
 typedef void *Hashfile;
-typedef void *Item;
 typedef void (*PrintRecord)(void *, FILE *);
 
-int getKey(char *chave, int nbuckets);
-
-Hashfile fcreateHF(char *nome, int nbuckets, int numRecPerBkt, int tamRec, int tamCh);
+Hashfile fcreateHF(char *nome,int nbuckets,int numRecPerBkt, int tamRec, int tamCh);
 /*
     Cria um novo arquivo segundo o path "nome", com nbuckets buckets,
     contendo "numRecPerBkt" registros cada bucket, cada registro de tamanho
@@ -56,15 +54,7 @@ int freadHF(Hashfile hf, char *ch, void *buf);
    caso o conteúdo de "buf" é não especificado).
 */
 
-void reorganizeHF(Hashfile hf, double percBuckLivres);
-/*
-    (NO CASO DE HASHFILE ESTÁTICO)
-    Re-cria o arquivo, alocando buckets suficientes para todos
-    os registros já armazenados mais uma certa porcentagem.
-    (ex. percBuckLivres == 1.2, significa 20% a mais).
-*/
-
-void dumpFileHF(Hashfile hf, FILE *F, PrintRecord p);
+void dumpFileHF(Hashfile hf, Info F, PrintRecord p);
 /*
     Produz no arquivo-texto "nomeArq" uma representação da
     organização e conteúdo do arquivo "hf". O parâmetro "p"

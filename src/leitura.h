@@ -14,12 +14,7 @@ void geo(QuadTree qt[11], HashTable ht[4], char geoArq[], char saida[]);
 void qry(QuadTree qt[11], HashTable ht[4], char path[], char nomeSaida[]);
 //le o arquivo .qry e chama as funcoes que realizam os comandos
 
-void ec(QuadTree qt[11], HashTable ht[4], char ecArq[]);
-//le o arquivo .ec e realiza suas funções, inclusive adicionando dados na tabela de espalhamento
-
-void pm(QuadTree qt[11], HashTable ht[4], char pmArq[]);
-
-void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], char paramEc[], char paramPm[]);
+void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], char paramEc[], char paramPm[], char nomeHash[], char nomebase[]);
 //recebe os parametros do programa, trata os parametros e chama as funcoes geo e qry
 
 #endif

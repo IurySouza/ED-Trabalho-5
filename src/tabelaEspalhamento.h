@@ -2,7 +2,7 @@
 #define __tabelaEspalhamento__
 
 #include "lista.h"
-
+#include "item.h"
 /************************************************/
 /*                  CONSULTAS                   */
 /*                0: cpf x endereço             */
@@ -17,7 +17,6 @@
 /************************************************/
 
 /* Ponteiros para a estrutura que representa um item da tabela e a tabela em si, respectivamente */
-typedef void *Item;
 typedef void *HashTable;
 
 /* Função responsável por inicializar uma tabela, definindo seu tamanho e criando as listas de colisões */

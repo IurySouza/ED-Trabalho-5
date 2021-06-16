@@ -50,4 +50,7 @@ void swapEndereco(Endereco e1, Endereco e2);
 void desalocarEndereco(Endereco endereco);
 // desaloca a memória utilizada para armazenar endereço
 
+int getSizeEndereco();
+// retorna o tamanho da struct Endereco
+
 #endif

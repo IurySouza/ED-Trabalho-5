@@ -118,3 +118,7 @@ void desalocarEndereco(Endereco endereco){
     free(e->ponto);
     free(e);
 }
+
+int getSizeEndereco(){
+    return sizeof(EnderecoStruct);
+}

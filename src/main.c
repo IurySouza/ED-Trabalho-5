@@ -11,6 +11,8 @@ int main(int argc, char *argv[]){
     char *outPath = NULL;
     char *paramEc = NULL;
     char* paramPm = NULL;
+    char* nomeHash = NULL;
+    char* nomebase = NULL;
     while(i<argc){
         if (strcmp("-f",argv[i])==0){
             i++;
@@ -66,13 +68,31 @@ int main(int argc, char *argv[]){
             paramPm = (char *)malloc((strlen(argv[i])+1)*sizeof(char));
             strcpy(paramPm,argv[i]);
         }
+        else if (strcmp("-k",argv[i])==0){
+            i++;
+            if (argv[i] == NULL){
+                printf("Erro! - Sem parametros em -pm");
+                exit(1);
+            }
+            nomeHash = (char *)malloc((strlen(argv[i])+1)*sizeof(char));
+            strcpy(nomeHash,argv[i]);
+        }
+        else if (strcmp("-u",argv[i])==0){
+            i++;
+            if (argv[i] == NULL){
+                printf("Erro! - Sem parametros em -pm");
+                exit(1);
+            }
+            nomebase = (char *)malloc((strlen(argv[i])+1)*sizeof(char));
+            strcpy(nomebase,argv[i]);
+        }
         i++;
     }
     if(paramGeo == NULL || outPath == NULL){
         printf("\nERRO\nArgumento essencial nao inserido\n");
         exit(1);
     }
-    tratamento(path,outPath,paramGeo,paramQry,paramEc,paramPm);
+    tratamento(path,outPath,paramGeo,paramQry,paramEc,paramPm,nomeHash,nomebase);
     if(paramQry != NULL){
 	    free(paramQry);
     }
@@ -86,6 +106,12 @@ int main(int argc, char *argv[]){
     }
     if(paramPm != NULL){
 	    free(paramPm);
+    }
+    if(nomeHash != NULL){
+	    free(nomeHash);
+    }
+    if(nomebase != NULL){
+	    free(nomebase);
     }
     printf("Mémoria desalocada\n");   
     return 0;

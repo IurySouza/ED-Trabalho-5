@@ -101,3 +101,7 @@ void desalocarEstabelecimento(Estabelecimento estabelecimento){
     free(e->ponto);
     free(e);
 }
+
+int getSizeEstabelecimento(){
+    return sizeof(EstabelecimentoStruct);
+}
