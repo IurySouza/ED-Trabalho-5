@@ -13,6 +13,7 @@ int main(int argc, char *argv[]){
     char* paramPm = NULL;
     char* nomeHash = NULL;
     char* nomebase = NULL;
+    char* paramVia = NULL;
     while(i<argc){
         if (strcmp("-f",argv[i])==0){
             i++;
@@ -86,13 +87,22 @@ int main(int argc, char *argv[]){
             nomebase = (char *)malloc((strlen(argv[i])+1)*sizeof(char));
             strcpy(nomebase,argv[i]);
         }
+        else if (strcmp("-v",argv[i])==0){
+            i++;
+            if (argv[i] == NULL){
+                printf("Erro! - Sem parametros em -pm");
+                exit(1);
+            }
+            paramVia = (char *)malloc((strlen(argv[i])+1)*sizeof(char));
+            strcpy(paramVia,argv[i]);
+        }
         i++;
     }
     if(paramGeo == NULL || outPath == NULL){
         printf("\nERRO\nArgumento essencial nao inserido\n");
         exit(1);
     }
-    tratamento(path,outPath,paramGeo,paramQry,paramEc,paramPm,nomeHash,nomebase);
+    tratamento(path,outPath,paramGeo,paramQry,paramEc,paramPm,nomeHash,nomebase,paramVia);
     if(paramQry != NULL){
 	    free(paramQry);
     }
@@ -112,6 +122,9 @@ int main(int argc, char *argv[]){
     }
     if(nomebase != NULL){
 	    free(nomebase);
+    }
+    if(paramVia != NULL){
+	    free(paramVia);
     }
     printf("Mémoria desalocada\n");   
     return 0;

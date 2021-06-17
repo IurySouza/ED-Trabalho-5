@@ -199,12 +199,28 @@ void eplg(FILE *svg, FILE *txt, QuadTree qt[11], HashTable ht[4], char tipo[], d
     removeList(l, NULL);
 }
 
-void catac(FILE *svg, FILE *txt, QuadTree qt[11], HashTable ht[4], double x, double y, double r, Lista extraFig) {
+void catac(FILE *svg, FILE *txt, QuadTree qt[11], HashTable ht[4], Grafo grafo, double x, double y, double r, Lista extraFig) {
     Info aux;
     QtNo info;
     No node;
     Ponto p;
     Lista l;
+
+    node = getFirst(grafo);
+    fprintf(txt, "Vertices:\n");
+    while(node != NULL){
+        Vertice v = getVertice(getInfo(node));
+        double xv = getX(getPontoVertice(v));
+        double yv = getY(getPontoVertice(v));
+        if(pontoInternoCirc(xv, yv, x, y, r)){
+            No removido = node;
+            node = getNext(node);
+            fprintf(txt, "Vertice: %s; x=%lf; y=%lf\n", getIdVertice(v), xv, yv);
+            removeNode(grafo, removido, desalocaAL);
+            continue;
+        }
+        node = getNext(node);
+    }
 
     l = nosDentroCirculoQt(qt[0], x, y, r);
     fprintf(txt, "Quadras:\n");
@@ -252,6 +268,18 @@ void catac(FILE *svg, FILE *txt, QuadTree qt[11], HashTable ht[4], double x, dou
         deletaItem(ht[2], getCpfEndereco(info), 1);
         info = removeNoQt(qt[10], aux);
         desalocarEndereco(info);
+    }
+
+    removeList(l, NULL);
+
+    l = nosDentroCirculoQt(qt[7], x, y, r);
+    fprintf(txt, "Postos de saude:\n");
+    for (node = getFirst(l); node != NULL; node = getNext(node)) {
+        aux = getInfo(node);
+        info = getInfoQt(qt[7], aux);
+        fprintf(txt, "Posto de saude: x=%lf; y=%lf; \n", getX(info), getY(info));
+        info = removeNoQt(qt[7], aux);
+        free(info);
     }
 
     removeList(l, NULL);

@@ -4,6 +4,7 @@
 #include "tabelaEspalhamento.h"
 #include "lista.h"
 #include "quadtree.h"
+#include "grafo.h"
 
 void moradores(FILE *txt, QuadTree qt[11], HashTable ht[4], char cep[]);
 /*
@@ -49,7 +50,7 @@ void eplg(FILE *svg, FILE *txt, QuadTree qt[11], HashTable ht[4], char tipo[], d
 */
 
 
-void catac(FILE *svg, FILE *txt, QuadTree qt[11], HashTable ht[4], double x, double y, double r, Lista extraFig);
+void catac(FILE *svg, FILE *txt, QuadTree qt[11], HashTable ht[4], Grafo Grafo, double x, double y, double r, Lista extraFig);
 /*
 * Remove as quadras, IUs, moradores e estabelecimentos comerciais dentro de um circulo
 * Entrada: vetor das quadtrees, vetor das hashtables, arquivos de saidas txt e svg, lista de figuras do qry e circulo

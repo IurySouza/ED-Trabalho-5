@@ -24,6 +24,7 @@
 #include "endereco.h"
 #include "hashfile.h"
 #include "leituraHash.h"
+#include "grafo.h"
 
 char *obterNomeArquivo(char path[]){
     char *aux = strrchr(path,'/');
@@ -146,7 +147,27 @@ void geo(QuadTree quadtrees[11], HashTable ht[4], char geoArq[], char saida[]){
     removeList(list[9], NULL);
 }
 
-void qry(QuadTree qt[11], HashTable ht[4], char path[], char nomeSaida[]){
+void via(Grafo grafo, char viaArq[]) {
+    char tipo[4], nome[100], lesq[50], ldir[50], i[100], j[100];
+    double x, y;
+    FILE *viaFile = fopen(viaArq, "r");
+    if (viaFile == NULL) {
+        printf("\nERRO ao abrir o arquivo .via\n");
+        exit(1);
+    }
+    while (fscanf(viaFile, "%s", tipo) != EOF) {
+        if(strcmp(tipo, "v") == 0) {
+            fscanf(viaFile, "%s %lf %lf",nome, &x, &y);
+            adicionarVertice(grafo, createVertice(nome,x,y));
+        } else if(strcmp(tipo, "a") == 0) {
+            fscanf(viaFile, "%s %s %s %s %lf %lf %s",i, j, ldir, lesq, &x, &y, nome);
+            adicionarAresta(grafo, i, createAresta(nome, ldir, lesq, x, y , j));
+        }
+    }
+    fclose(viaFile);
+}
+
+void qry(QuadTree qt[11], HashTable ht[4], Grafo grafo, char path[], char nomeSaida[]){
     char* pathTxt = malloc((5 + strlen(nomeSaida))*sizeof(char));
     char* pathSvg = malloc((5 + strlen(nomeSaida))*sizeof(char));
     sprintf(pathTxt,"%s.txt",nomeSaida);
@@ -291,27 +312,27 @@ void qry(QuadTree qt[11], HashTable ht[4], char path[], char nomeSaida[]){
         else if(strcmp(tipo, "catac") == 0) {
             fscanf(consulta, "%lf %lf %lf", &x, &y, &w);
             fprintf(saida, "%s %lf %lf %lf\n", tipo, x, y, w);
-            catac(svg, saida, qt, ht,x, y, w, extraFig);
+            catac(svg, saida, qt, ht, grafo, x, y, w, extraFig);
         }
         else if(strcmp(tipo, "@m?") == 0) {
             fscanf(consulta, "%s %s", r1, cpf);
             fprintf(saida, "%s %s %s\n", tipo, r1, cpf);
-            m(svg, r1, cpf, reg[11], ht, extraFig);
+            m(svg, r1, cpf, reg, ht, extraFig);
         }
         else if(strcmp(tipo, "@e?") == 0) {
             fscanf(consulta, "%s %s %c %d", r1, cepid, &face, &j);
             fprintf(saida, "%s %s %s %c %d\n", tipo, r1, cepid, face, j);
-            // e();
+            e(svg, r1, cepid, face, j, reg, ht, extraFig);
         }
         else if(strcmp(tipo, "@g?") == 0) {
             fscanf(consulta, "%s %s", r1, cepid);
             fprintf(saida, "%s %s %s\n", tipo, r1, cepid);
-            // g();
+            g(svg, r1, reg, cepid, qt, extraFig);
         }
         else if(strcmp(tipo, "@xy") == 0) {
             fscanf(consulta, "%s %lf %lf", r1, &x, &y);
             fprintf(saida, "%s %s %lf %lf\n", tipo, r1, x, y);
-            // xy();
+            xy(svg, r1, reg, x, y, extraFig);
         }
         else if(strcmp(tipo, "ccv") == 0) {
             fscanf(consulta, "%s", aux);
@@ -339,6 +360,9 @@ void qry(QuadTree qt[11], HashTable ht[4], char path[], char nomeSaida[]){
             // pb();
         }
     }
+    for(int i = 0; i < 11; i++) {
+        free(reg[i]);
+    }
     desenharSvg(svg,qt,extraFig);
     fecharSvg(svg);
     fclose(saida);
@@ -348,7 +372,7 @@ void qry(QuadTree qt[11], HashTable ht[4], char path[], char nomeSaida[]){
     removeList(extraFig,free);
 }
 
-void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], char paramEc[], char paramPm[], char nomeHash[], char nomebase[]){
+void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], char paramEc[], char paramPm[], char nomeHash[], char nomebase[], char paramVia[]){
     char *geoArq = NULL;
     char *qryArq = NULL;
     char *ecArq = NULL;
@@ -359,6 +383,7 @@ void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], c
     char *saidaGeo = NULL;
     char *saidaQry = NULL;
     char *hashFileName = NULL;
+    char *viaArq = NULL;
     int i;
     if (path != NULL) {
         if(path[strlen(path) - 1] != '/'){
@@ -376,6 +401,10 @@ void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], c
                 pmArq = (char *)malloc((strlen(paramPm)+strlen(path)+2)*sizeof(char));
                 sprintf(pmArq,"%s/%s",path,paramPm);
             }
+            if (paramVia != NULL){
+                viaArq = (char *)malloc((strlen(paramVia)+strlen(path)+2)*sizeof(char));
+                sprintf(viaArq,"%s/%s",path,paramVia);
+            }
         }
 		else{
             geoArq = (char *)malloc((strlen(paramGeo)+strlen(path)+1)*sizeof(char));
@@ -392,6 +421,10 @@ void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], c
                 pmArq = (char *)malloc((strlen(paramPm)+strlen(path)+1)*sizeof(char));
                 sprintf(pmArq,"%s%s",path,paramPm);
             }
+            if (paramVia != NULL){
+                viaArq = (char *)malloc((strlen(paramVia)+strlen(path)+1)*sizeof(char));
+                sprintf(viaArq,"%s%s",path,paramVia);
+            }
         }
 	} else {
 		geoArq = (char *)malloc((strlen(paramGeo)+1)*sizeof(char));
@@ -407,6 +440,10 @@ void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], c
         if(paramPm != NULL){
             pmArq = (char *)malloc((strlen(paramPm)+1)*sizeof(char));
             strcpy(pmArq, paramPm);
+        }
+        if(paramVia != NULL){
+            viaArq = (char *)malloc((strlen(paramVia)+1)*sizeof(char));
+            strcpy(viaArq, paramVia);
         }
 	}
     nomeGeo = obterNomeArquivo(paramGeo);
@@ -429,6 +466,7 @@ void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], c
     for (i = 0; i < 4; i++) {
         ht[i] = iniciaTabela(1117);
     }
+    Grafo grafo = createGrafo();
     geo(trees, ht, geoArq, saidaGeo);
     if(nomebase != NULL){
         readHashfile(ht, trees[9], trees[10], nomebase);
@@ -441,11 +479,15 @@ void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], c
             pm(trees, ht, pmArq);
         }
     }
+    if(viaArq != NULL){
+        via(grafo, viaArq);
+        free(viaArq);
+    }
     if (paramQry != NULL){
         nomeQry = obterNomeArquivo(paramQry);
         saidaQry = (char*)malloc((strlen(nomeQry) + strlen(saida) + 2)*sizeof(char));
         sprintf(saidaQry,"%s-%s",saida,nomeQry);
-        qry(trees, ht, qryArq, saidaQry);
+        qry(trees, ht, grafo, qryArq, saidaQry);
         free(saidaQry);
         free(qryArq); 
     }
@@ -463,10 +505,12 @@ void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], c
     free(saida);
     free(saidaGeo);
     deletaTabela(ht[0], 0);
+    imprimeTabela(ht[1]);
     deletaTabela(ht[1], 1);
     deletaTabela(ht[2], 1);
     deletaTabela(ht[3], 0);
     for(i = 0; i < 11; i++){
         desalocaQt(trees[i]);
     }
+    desalocaGrafo(grafo);
 }
