@@ -93,7 +93,7 @@ void imprimeTabela(HashTable t) {
         No aux = getFirst(h->tabela[i]);
         while (aux != NULL) {
             Item i = getInfo(aux);
-            printf("%s: %s\n", getChaveItem(i), (char*)getValor(h, getChaveItem(i)));
+            printf("%s: %s\n", getChaveItem(i), (char*)getValorItem(i));
             aux = getNext(aux);
         }
     }

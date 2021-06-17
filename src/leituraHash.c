@@ -36,7 +36,7 @@ void ec(QuadTree qt[11], HashTable ht[4], char ecArq[]) {
         if(strcmp(tipo, "t") == 0) {
             fscanf(ecFile, "%s", codt);
             fgets(auxd, 255, ecFile);
-            descricao = (char*) malloc((strlen(auxd) + 1) * sizeof(char));
+            descricao = (char*) malloc(255 * (sizeof(char)));
             strcpy(descricao, auxd);
             adicionaItem(ht[1], codt, descricao);
         } else if(strcmp(tipo, "e") == 0) {
@@ -120,7 +120,7 @@ void saveHashfile(HashTable ht[4], QuadTree estabelecimentos, QuadTree enderecos
         percorrerTabela(ht[i - 1], listInsert, lAux[i]);
     }
     for(int i = 0; i < 4; i++){
-        if (i != 0) listToHashfile(hf[i], lAux[i]);
+        listToHashfile(hf[i], lAux[i]);
         fcloseHF(hf[i]);
     }
     removeList(lEst, NULL);

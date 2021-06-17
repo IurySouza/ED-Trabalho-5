@@ -12,6 +12,8 @@ void m(FILE* svg, char r[], char cpf[], Ponto reg[11], HashTable ht[4], Lista ex
 
 void e(FILE* svg, char r[], char cep[], char face, int num, Ponto reg[11], HashTable ht[4], Lista extraFig);
 
-void g(FILE* svg, char r[], char id[], Ponto reg[], QuadTree qt[11], Lista extraFig);
+void g(FILE* svg, char r[], Ponto reg[11], char id[], QuadTree qt[11], Lista extraFig);
+
+void xy(FILE* svg, char r[], Ponto reg[11], double x, double y, Lista extraFig);
 
 #endif

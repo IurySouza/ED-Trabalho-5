@@ -28,6 +28,10 @@ void m(FILE* svg, char r[], char cpf[], Ponto reg[11], HashTable ht[4], Lista ex
     *tamanho = getTamanho(extraFig);
     listInsert(tamanho, extraFig);
     fprintf(svg, "<line id=\"%d\" x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"0\" style=\"stroke:black;stroke-width:2\" />\n", *tamanho, getX(p), getY(p), getX(p));
+    int *tamanho2 = (int*) malloc(sizeof(int));
+    *tamanho2 = getTamanho(extraFig);
+    listInsert(tamanho2, extraFig);
+    fprintf(svg,"\t<text id=\"%d\" x=\"%lf\" y=\"0\" fill=\"black\">%s</text>\n", *tamanho2, getX(p),r);
 }
 
 void e(FILE* svg, char r[], char cep[], char face, int num, Ponto reg[11], HashTable ht[4], Lista extraFig) {
@@ -70,9 +74,50 @@ void e(FILE* svg, char r[], char cep[], char face, int num, Ponto reg[11], HashT
     *tamanho = getTamanho(extraFig);
     listInsert(tamanho, extraFig);
     fprintf(svg, "<line id=\"%d\" x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"0\" style=\"stroke:black;stroke-width:2\" />\n", *tamanho, x, y, x);
+    int *tamanho2 = (int*) malloc(sizeof(int));
+    *tamanho2 = getTamanho(extraFig);
+    listInsert(tamanho2, extraFig);
+    fprintf(svg,"\t<text id=\"%d\" x=\"%lf\" y=\"0\" fill=\"black\">%s</text>\n", *tamanho2, x,r);
 }
 
-void g(FILE* svg, char r[], char id[], Ponto reg[11], QuadTree qt[11], Lista extraFig) {
+void g(FILE* svg, char r[], Ponto reg[11], char id[], QuadTree qt[11], Lista extraFig){
     int index = getIndex(r);
-    //Instrumento h = getInfoQt()
+    Info q = NULL;
+    for(int i = 1; i < 4; i++){
+        No aux = getNodeByIdQt(qt[i], id);
+        if(aux != NULL){
+            q = getInfoQt(qt[i], aux);
+            return;
+        }
+    }
+    if(q == NULL) {
+        return;
+    }
+    Ponto p = getPontoIU(q);
+    double x = getX(p);
+    double y = getY(p);
+    setX(reg[index], x);
+    setY(reg[index], y);
+    int *tamanho = (int*) malloc(sizeof(int));
+    *tamanho = getTamanho(extraFig);
+    listInsert(tamanho, extraFig);
+    fprintf(svg, "<line id=\"%d\" x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"0\" style=\"stroke:black;stroke-width:2\" />\n", *tamanho, x, y, x);
+    int *tamanho2 = (int*) malloc(sizeof(int));
+    *tamanho2 = getTamanho(extraFig);
+    listInsert(tamanho2, extraFig);
+    fprintf(svg,"\t<text id=\"%d\" x=\"%lf\" y=\"0\" fill=\"black\">%s</text>\n", *tamanho2, x,r);
+}
+
+void xy(FILE* svg, char r[], Ponto reg[11], double x, double y, Lista extraFig) {
+    int index = getIndex(r);
+    setX(reg[index], x);
+    setY(reg[index], y);
+    int *tamanho = (int*) malloc(sizeof(int));
+    *tamanho = getTamanho(extraFig);
+    listInsert(tamanho, extraFig);
+    fprintf(svg, "<line id=\"%d\" x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"0\" style=\"stroke:black;stroke-width:2\" />\n", *tamanho, x, y, x);
+    int *tamanho2 = (int*) malloc(sizeof(int));
+    *tamanho2 = getTamanho(extraFig);
+    listInsert(tamanho2, extraFig);
+    fprintf(svg,"\t<text id=\"%d\" x=\"%lf\" y=\"0\" fill=\"black\">%s</text>\n", *tamanho2, x,r);
 }
