@@ -296,12 +296,12 @@ void qry(QuadTree qt[11], HashTable ht[4], char path[], char nomeSaida[]){
         else if(strcmp(tipo, "@m?") == 0) {
             fscanf(consulta, "%s %s", r1, cpf);
             fprintf(saida, "%s %s %s\n", tipo, r1, cpf);
-            m(svg, r1, cpf, reg[11], ht, extraFig);
+            m(svg, r1, cpf, reg, ht, extraFig);
         }
         else if(strcmp(tipo, "@e?") == 0) {
             fscanf(consulta, "%s %s %c %d", r1, cepid, &face, &j);
             fprintf(saida, "%s %s %s %c %d\n", tipo, r1, cepid, face, j);
-            // e();
+            e(svg, r1, cepid, face, j, reg, ht, extraFig);
         }
         else if(strcmp(tipo, "@g?") == 0) {
             fscanf(consulta, "%s %s", r1, cepid);

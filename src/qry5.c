@@ -6,6 +6,7 @@
 #include "tabelaEspalhamento.h"
 #include "endereco.h"
 #include "quadra.h"
+#include "instrumentoUrbano.h"
 
 int getIndex(char r[]) {
     char* rAux = malloc((strlen(r) + 1) * sizeof(char));
@@ -69,4 +70,9 @@ void e(FILE* svg, char r[], char cep[], char face, int num, Ponto reg[11], HashT
     *tamanho = getTamanho(extraFig);
     listInsert(tamanho, extraFig);
     fprintf(svg, "<line id=\"%d\" x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"0\" style=\"stroke:black;stroke-width:2\" />\n", *tamanho, x, y, x);
+}
+
+void g(FILE* svg, char r[], char id[], Ponto reg[11], QuadTree qt[11], Lista extraFig) {
+    int index = getIndex(r);
+    //Instrumento h = getInfoQt()
 }
