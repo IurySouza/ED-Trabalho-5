@@ -159,11 +159,12 @@ void via(Grafo grafo, char viaArq[]) {
         if(strcmp(tipo, "v") == 0) {
             fscanf(viaFile, "%s %lf %lf",nome, &x, &y);
             adicionarVertice(grafo, createVertice(nome,x,y));
-        } else if(strcmp(tipo, "a") == 0) {
+        } else if(strcmp(tipo, "e") == 0) {
             fscanf(viaFile, "%s %s %s %s %lf %lf %s",i, j, ldir, lesq, &x, &y, nome);
             adicionarAresta(grafo, i, createAresta(nome, ldir, lesq, x, y , j));
         }
     }
+    excluirVerticesIsolados(grafo);
     fclose(viaFile);
 }
 
@@ -184,9 +185,10 @@ void qry(QuadTree qt[11], HashTable ht[4], Grafo grafo, char path[], char nomeSa
     for(int i = 0; i < 11; i++) {
         reg[i] = createPoint(1, 1);
     }
-    int j,k,i;
+    int j,k,i, idPath = 0;
     double x,y,h,w;
     char face, tipo[7], cepid[20], aux[20], corb[22], corp[22], cpf[15], r1[5], r2[5];
+    char sufx[20] = "";
     while(fscanf(consulta,"%s",tipo) != EOF){
         if(strcmp(tipo,"o?") == 0){
             fscanf(consulta,"%s %s",cepid,aux);
@@ -342,7 +344,10 @@ void qry(QuadTree qt[11], HashTable ht[4], Grafo grafo, char path[], char nomeSa
         else if(strcmp(tipo, "p?") == 0) {
             fscanf(consulta, "%s %s %s %s %s", aux, r1, r2, corb, corp);
             fprintf(saida, "%s %s %s %s %s %s\n", tipo, aux, r1, r2, corb, corp);
-            // p();
+            if(strcmp(aux,"-") != 0){
+                strcpy(sufx, aux);
+            }
+            p(nomeSaida, sufx, qt, grafo, reg[getIndex(r1)], reg[getIndex(r2)], &idPath, corb, corp);
         }
         else if(strcmp(tipo, "bf") == 0) {
             fscanf(consulta, "%s", r1);
@@ -505,7 +510,6 @@ void tratamento(char path[], char outPath[], char paramGeo[], char paramQry[], c
     free(saida);
     free(saidaGeo);
     deletaTabela(ht[0], 0);
-    imprimeTabela(ht[1]);
     deletaTabela(ht[1], 1);
     deletaTabela(ht[2], 1);
     deletaTabela(ht[3], 0);

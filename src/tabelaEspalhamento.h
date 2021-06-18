@@ -34,6 +34,9 @@ void deletaItem(HashTable t, char chave[], int flag);
 /* Função em que dada uma chave, retorna seu respectivo valor */
 Item getValor(HashTable t, char chave[]);
 
+/* Função em que dada uma chave, altera seu respectivo valor */
+void mudarValor(HashTable t, char chave[], Info novo);
+
 /* Função que deleta a tabela completamente */
 void deletaTabela(HashTable t, int flag);
 

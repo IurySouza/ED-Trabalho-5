@@ -69,6 +69,19 @@ Item getValor(HashTable t, char chave[]) {
     return NULL;
 }
 
+void mudarValor(HashTable t, char chave[], Info novo) {
+    HashTableStruct *h = (HashTableStruct*) t;
+    int hashKey = getChave(chave, h->tamanho);
+
+    for (No aux = getFirst(h->tabela[hashKey]); aux != NULL; aux = getNext(aux)) {
+        Item i = getInfo(aux);
+        if (strcmp(getChaveItem(i), chave) == 0) {
+            setValorItem(i, novo);
+            return;
+        }
+    }
+}
+
 void deletaTabela(HashTable t, int flag) {
     HashTableStruct *h = (HashTableStruct*) t;
     void (*desaloca[2])(Item) = {desalocaItem, desalocaValorItem};

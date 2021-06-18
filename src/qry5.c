@@ -7,6 +7,8 @@
 #include "endereco.h"
 #include "quadra.h"
 #include "instrumentoUrbano.h"
+#include "verificacao.h"
+#include "svg.h"
 
 int getIndex(char r[]) {
     char* rAux = malloc((strlen(r) + 1) * sizeof(char));
@@ -120,4 +122,106 @@ void xy(FILE* svg, char r[], Ponto reg[11], double x, double y, Lista extraFig) 
     *tamanho2 = getTamanho(extraFig);
     listInsert(tamanho2, extraFig);
     fprintf(svg,"\t<text id=\"%d\" x=\"%lf\" y=\"0\" fill=\"black\">%s</text>\n", *tamanho2, x,r);
+}
+
+void descreverPath(FILE* txt, Lista path, Grafo grafo){
+   
+}
+
+void p(char nomeSaida[], char sufx[], QuadTree qt[11], Grafo grafo, Ponto inicio, Ponto fim, int *idPath, char cmc[], char cmr[]){
+    if(getFirst(grafo) == NULL){
+        printf("grafo vazio\n");
+        return;
+    }
+    Vertice vi = getVertice(getInfo(getFirst(grafo)));
+    Vertice vf = getVertice(getInfo(getFirst(grafo)));
+    char idi[50], idf[50];
+    strcpy(idi, getIdVertice(vi));
+    strcpy(idf, getIdVertice(vf));
+    double di = distancia(getX(getPontoVertice(vi)),getY(getPontoVertice(vi)), getX(inicio), getY(inicio));
+    double df = distancia(getX(getPontoVertice(vf)),getY(getPontoVertice(vf)), getX(fim), getY(fim));
+    for(No node = getNext(getFirst(grafo)); node != NULL; node = getNext(node)){
+        Vertice vAux = getVertice(getInfo(node));
+        double dAux = distancia(getX(getPontoVertice(vAux)),getY(getPontoVertice(vAux)), getX(inicio), getY(inicio));
+        if(di > dAux){
+            strcpy(idi, getIdVertice(vAux));
+            di = dAux;
+        }
+        dAux = distancia(getX(getPontoVertice(vAux)),getY(getPontoVertice(vAux)), getX(fim), getY(fim));
+        if(df > dAux){
+            strcpy(idf, getIdVertice(vAux));
+            df = dAux;
+        }
+    }
+    char *nomeSvg = malloc(sizeof(char) * (strlen(nomeSaida) + strlen(sufx) + 6));
+    char *nomeTxt = malloc(sizeof(char) * (strlen(nomeSaida) + strlen(sufx) + 6));
+    sprintf(nomeSvg,"%s-%s.svg", nomeSaida, sufx);
+    sprintf(nomeTxt,"%s-%s.txt", nomeSaida, sufx);
+    FILE* svg = iniciarSvg(nomeSvg);
+    FILE* txt = fopen(nomeTxt, "w");
+    double dmc, dmr;
+    Lista pathMC = dijkstra(grafo, idi, idf, &dmc, getCmpAresta);
+    Lista pathMR = dijkstra(grafo, idi, idf, &dmr, getTempoAresta);
+    if(pathMC != NULL && pathMR != NULL){
+        desenharSvg(svg, qt, NULL);
+        desenharPath(svg, pathMC, grafo, ++(*idPath), cmc);
+        desenharPath(svg, pathMR, grafo, ++(*idPath), cmr);
+        removeList(pathMC,free);
+        removeList(pathMR,free);
+    }
+    else{
+        fprintf(txt, "Não existe caminho\n");
+    }
+    fecharSvg(svg);
+    fclose(txt);
+    free(nomeSvg);
+    free(nomeTxt);
+}
+
+void pb(char nomeSaida[], char sufx[], QuadTree qt[11], Grafo g, Ponto inicio, Ponto fim, int *idPath, char cmc[]){
+    Grafo gnd = gerarGrafoNaoDirecionado(g);
+    Grafo grafo = prim(gnd);    
+    Vertice vi = getFirst(getVertice(getFirst(grafo)));
+    Vertice vf = getFirst(getVertice(getFirst(grafo)));
+    char idi[50], idf[50];
+    strcpy(idi, getIdVertice(vi));
+    strcpy(idf, getIdVertice(vf));
+    double di = distancia(getX(getPontoVertice(vi)),getY(getPontoVertice(vi)), getX(inicio), getY(inicio));
+    double df = distancia(getX(getPontoVertice(vf)),getY(getPontoVertice(vf)), getX(fim), getY(fim));
+    for(No node = getNext(getFirst(grafo)); node != NULL; node = getNext(node)){
+        Vertice vAux = getVertice(getInfo(node));
+        double dAux = distancia(getX(getPontoVertice(vAux)),getY(getPontoVertice(vAux)), getX(inicio), getY(inicio));
+        if(di > dAux){
+            strcpy(idi, getIdVertice(vAux));
+            di = dAux;
+        }
+        dAux = distancia(getX(getPontoVertice(vAux)),getY(getPontoVertice(vAux)), getX(fim), getY(fim));
+        if(df > dAux){
+            strcpy(idf, getIdVertice(vAux));
+            df = dAux;
+        }
+    }
+    char *nomeSvg = malloc(sizeof(char) * (strlen(nomeSaida) + strlen(sufx) + 6));
+    char *nomeTxt = malloc(sizeof(char) * (strlen(nomeSaida) + strlen(sufx) + 6));
+    sprintf(nomeSvg,"%s-%s.svg", nomeSaida, sufx);
+    sprintf(nomeTxt,"%s-%s.txt", nomeSaida, sufx);
+    FILE* svg = iniciarSvg(nomeSvg);
+    FILE* txt = fopen(nomeTxt, "w");
+    double dmc;
+    Lista pathMC = dijkstra(grafo, idi, idf, &dmc, getCmpAresta);
+    if(pathMC != NULL){
+        desenharSvg(svg, qt, NULL);
+        desenharPath(svg, pathMC, grafo, ++(*idPath), cmc);
+        //descrever
+        removeList(pathMC,NULL);
+    }
+    else{
+        fprintf(txt, "Não existe caminho\n");
+    }
+    desalocaGrafo(gnd);
+    desalocaGrafo(grafo);
+    fecharSvg(svg);
+    fclose(txt);
+    free(nomeSvg);
+    free(nomeTxt);
 }

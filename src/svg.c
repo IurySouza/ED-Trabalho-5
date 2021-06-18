@@ -18,7 +18,7 @@ FILE* iniciarSvg(char filename[]){
         exit(1);
     }
     char* corSombra[6] = {"#FFFF00", "#FF9955", "#FF0000", "#FF00CC", "#6600FF", "#A02C5A"};
-    fprintf(svg, "<svg>\n\t<defs>\n");
+    fprintf(svg, "<svg version=\"1.1\" baseProfile=\"full\" width=\"10000\" height=\"10000\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n\t<defs>\n");
     for(int i = 0; i < 6; i++){
         fprintf(svg, "\t\t<filter id=\"shadow%d\">\n\t\t\t<feDropShadow dx=\"2\" dy=\"2\" stdDeviation=\"0.2\" flood-color=\"%s\"/>\n\t\t</filter>\n", i, corSombra[i]);
     }
