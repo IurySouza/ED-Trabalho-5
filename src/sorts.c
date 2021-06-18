@@ -182,7 +182,7 @@ void balancearQuadTree(QuadTree qt, Lista l, Ponto (*getPonto)(void*), void (*sw
 int insidePolygon(Lista pontos, Ponto ponto){
     listInsert(getInfo(getFirst(pontos)), pontos);
     for(No node = getNext(getFirst(pontos)); node != NULL; node = getNext(node)){
-        int flag = orientacao(getInfo(node), getInfo(getLast(node)), ponto);
+        int flag = orientacao(getInfo(getPrevious(node)), getInfo(node), ponto);
         if(flag == -1){
             removeNode(pontos, getLast(pontos), NULL);
             return 0;

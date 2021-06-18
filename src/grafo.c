@@ -38,6 +38,17 @@ AdjList getAdjList(Grafo grafo, char id[]){
     return NULL;
 }
 
+Aresta getArestaByDest(AdjList adjList, char id[]){
+    AdjListStruct* al = (AdjListStruct*) adjList;
+    for(No node = getFirst(al->arestas); node != NULL; node = getNext(node)){
+        Aresta a = getInfo(node);
+        if(strcmp(id, getDestinoAresta(a)) == 0){
+            return a;
+        }
+    }
+    return NULL;
+}
+
 void adicionarVertice(Grafo grafo, Vertice vertice){
     AdjListStruct* al = (AdjListStruct*)malloc(sizeof(AdjListStruct));
     al->inicio = vertice;
@@ -93,6 +104,37 @@ Grafo gerarGrafoNaoDirecionado(Grafo grafo){
         }
     }
     return gnd; 
+}
+
+void excluirVerticesIsolados(Grafo g){
+    Lista visitados = createList();
+    for(No i = getFirst(g); i != NULL; i = getNext(i)){
+        AdjListStruct* al = getInfo(i);
+        if(getTamanho(al->arestas) && !strInList(visitados, getIdVertice(al->inicio))){
+            char* id = malloc(sizeof(char) * (strlen(getIdVertice(al->inicio)) + 1));
+            strcpy(id, getIdVertice(al->inicio));
+            listInsert(id, visitados);
+        }
+        for(No j = getFirst(al->arestas); j != NULL; j = getNext(j)){
+            char *aux = getDestinoAresta(getInfo(j));
+            if(!strInList(visitados, aux)){
+                char* id = malloc(sizeof(char) * (strlen(aux) + 1));
+                strcpy(id, aux);
+                listInsert(id, visitados);
+            }
+        }
+    }
+    No node = getFirst(visitados);
+    while (node != NULL){
+        if(!strInList(visitados, getInfo(node))){
+            No aux = node;
+            node = getNext(node);
+            removeNode(g, aux, desalocaAL);
+            continue;
+        }
+        node = getNext(node);
+    }
+    removeList(visitados, free);
 }
 
 Grafo prim(Grafo grafo){
@@ -173,8 +215,10 @@ Lista dijkstra(Grafo grafo, char idi[], char idf[], double* distTotal, double ge
                 }
                 else if(*dist > getPeso(aresta) + *dAnt){
                     *dist = getPeso(aresta) + *dAnt;
-                    char* tempId = getValor(anterior, idaux);
+                    free(getValor(anterior, idaux));
+                    char* tempId = malloc(sizeof(char) * (strlen(idi) + 1));
                     strcpy(tempId,idi);
+                    mudarValor(anterior, idaux, tempId);
                 }
             }
         }
@@ -232,4 +276,27 @@ void desenharGrafo(Grafo g, FILE* svg){
         }
         desenharVertice(getVertice(aux), svg);
     }
+}
+
+void desenharPath(FILE* fileSvg, Lista path, Grafo g, int id, char cor[]){
+    Ponto inicial = getPontoVertice(getVertice(getAdjList(g, getInfo(getFirst(path)))));
+    Ponto final = getPontoVertice(getVertice(getAdjList(g, getInfo(getFirst(path)))));
+    fprintf(fileSvg, "\n\t<circle cx=\"%lf\" cy=\"%lf\" r=\"10\" style=\"stroke:magenta;fill:purple;stroke-width:1\"/>", getX(inicial), getY(inicial));
+    fprintf(fileSvg, "\n\t<circle cx=\"%lf\" cy=\"%lf\" r=\"10\" style=\"stroke:magenta;fill:purple;stroke-width:1\"/>", getX(final), getY(final));
+    fprintf(fileSvg, "\n\t<text x=\"%lf\" y=\"%lf\" fill=\"white\" text-anchor=\"middle\" >I</text>", getX(inicial), getY(inicial));
+    fprintf(fileSvg, "\n\t<text x=\"%lf\" y=\"%lf\" fill=\"white\" text-anchor=\"middle\" >F</text>", getX(final), getY(final));
+    int primeiro = 1;
+    fprintf(fileSvg, "\n\t<path style=\"fill:none;stroke:%s;stroke-width:2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\"\n\t d=\" M", cor);
+    for(No node = getLast(path); node != NULL; node = getPrevious(node)){
+        inicial = getPontoVertice(getVertice(getAdjList(g, getInfo(node))));
+        if(primeiro == 1){
+            fprintf(fileSvg, " %lf %lf", getX(inicial), getY(inicial));
+            primeiro = 0;
+        }
+        else{
+            fprintf(fileSvg, "L %lf %lf", getX(inicial), getY(inicial));
+        }
+    }
+    fprintf(fileSvg, "\" id=\"%d\" />", id);
+    fprintf(fileSvg, "\n\t<circle cx=\"\" cy=\"\" r=\"5\" fill=\"red\"><animateMotion dur=\"6s\" repeatCount=\"indefinite\"><mpath xlink:href=\"#%d\"/></animateMotion></circle>", id);
 }

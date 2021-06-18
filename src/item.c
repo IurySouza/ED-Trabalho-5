@@ -35,6 +35,11 @@ Info getValorItem(Item item){
     return i->valor;
 }
 
+void setValorItem(Item item, Info valor){
+    ItemStruct* i = (ItemStruct*) item;
+    i->valor = valor;
+}
+
 void desalocaValorItem(Item item){
     ItemStruct* i = (ItemStruct*) item;
     free(i->chave);

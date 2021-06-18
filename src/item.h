@@ -12,6 +12,8 @@ char* getChaveItem(Item item);
 
 Info getValorItem(Item item);
 
+void setValorItem(Item item, Info valor);
+
 void desalocaValorItem(Item item);
 
 void desalocaItem(Item item);
