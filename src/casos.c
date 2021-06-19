@@ -61,15 +61,15 @@ void desenharCasos(CasosCovid caso, FILE* svg){
     double x = getX(getPontoCaso(c));
     double y = getY(getPontoCaso(c));
     switch (getFaceCaso(c)){
-    case 'n':
+    case 'N':
         y -= h;
         break;
-    case 'o':
+    case 'O':
         x -= w;
         break;
     }
     fprintf(svg,"\t<rect x=\"%lf\" y=\"%lf\" width=\"%lf\" height=\"%lf\" fill=\"%s\" />\n",x,y,w,h,"orange");
-    fprintf(svg,"\t<text x=\"%lf\" y=\"%lf\" fill=\"white\" >%d</text>\n",x + w/2,y + h/2,getNCasos(c));
+    fprintf(svg,"\t<text x=\"%lf\" y=\"%lf\" text-anchor=\"middle\" fill=\"white\" >%d</text>\n",x + w/2,y + h/2,getNCasos(c));
 }
 
 void desalocarCaso(CasosCovid caso){
