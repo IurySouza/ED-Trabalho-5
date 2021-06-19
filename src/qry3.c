@@ -68,20 +68,19 @@ void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, Gr
         break;
     }
     Lista l = createList();
-    Lista path = createList();
     Vertice vi, vf, aux;
     No ngr;
     int i = 0;
     ngr = getFirst(grafo);
     while(ngr != NULL) {
-        //aux = getVertice(getInfo(node));
+        aux = getVertice(getInfo(ngr));
         if(i == 0) {
-            vi = ngr;
+            vi = aux;
         } else {
-            double xv = getX(getPontoVertice(ngr));
-            double yv = getY(getPontoVertice(ngr));
+            double xv = getX(getPontoVertice(aux));
+            double yv = getY(getPontoVertice(aux));
             if(distancia(x, y, xv, yv) < distancia(x, y, getX(getPontoVertice(vi)), getY(getPontoVertice(vi)))) {
-                vi = ngr;
+                vi = aux;
             }
         }
         ngr = getNext(ngr);
@@ -96,13 +95,15 @@ void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, Gr
     fprintf(svg, "\t<rect id=\"%d\" x=\"%lf\" y=\"%lf\" width=\"10\" height=\"4\" style=\"fill:blue;stroke-width:2;stroke:white\" />\n",*tamanho, x, y);
     listInsert(tamanho, extraFig);
     i = 0;
+    int j = 0;
     node = getFirst(l);
     while (i < k && node != NULL) {
         fig = getInfo(node);
         ngr = getFirst(grafo);
+        j = 0;
         while(ngr != NULL) {
-            aux = getVertice(getInfo(node));
-            if(i == 0) {
+            aux = getVertice(getInfo(ngr));
+            if(j == 0) {
                 vf = aux;
             } else {
                 double xv = getX(getPontoVertice(aux));
@@ -112,26 +113,19 @@ void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, Gr
                 }
             }
             ngr = getNext(ngr);
+            j++;
         }
         strcpy(idf, getIdVertice(vf));
-        path = dijkstra(grafo, idi, idf, &d, getCmpAresta);
+        Lista path = dijkstra(grafo, idi, idf, &d, getCmpAresta);
+        int* tamanho = (int*)malloc(sizeof(int));
         *tamanho = getTamanho(extraFig);
         desenharPath(svg, path, grafo, *tamanho, "red");
         fprintf(txt, "x: %lf y: %lf\n", getX(fig), getY(fig));
         listInsert(tamanho, extraFig);
         i++;
-
-        /*fig = getInfo(node);
-        tamanho = (int*)malloc(sizeof(int));
-        *tamanho = getTamanho(extraFig);
-        fprintf(svg, "\t<line id=\"%d\" x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"%lf\" stroke=\"black\" stroke-width=\"2\" stroke-dasharray=\"5\" />\n",*tamanho, getX(fig), getY(fig), x, y);
-        listInsert(tamanho, extraFig);
-        fprintf(txt, "x: %lf y: %lf\n", getX(fig), getY(fig));
-        node = getNext(node);
-        i++;*/
+        removeList(path, free);
     }
     removeList(l,NULL);
-    removeList(path, NULL);
 }
 
 void ci(FILE* svg, FILE* txt, QuadTree qt[11], HashTable ht[4], double x, double y, double r, Lista extraFig){

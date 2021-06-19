@@ -28,8 +28,8 @@ Ponto getPontoVertice(Vertice vertice){
 
 void desenharVertice(Vertice vertice, FILE* svg){
     VerticeStruct* v = (VerticeStruct*) vertice;
-    fprintf(svg,"\t<circle cx=\"%lf\" cy=\"%lf\" r=\"10\" fill=\"blue\" stroke=\"blue\" />\n",getX(v->ponto),getY(v->ponto));
-    fprintf(svg,"\t<text x=\"%lf\" y=\"%lf\" stroke=\"black\" text-anchor=\"middle\" stroke-width=\"0.3\" fill=\"black\">%s</text>\n",getX(v->ponto),getY(v->ponto),v->id);
+    fprintf(svg,"\t<circle cx=\"%lf\" cy=\"%lf\" r=\"5\" fill=\"blue\" stroke=\"blue\" />\n",getX(v->ponto),getY(v->ponto));
+    //fprintf(svg,"\t<text x=\"%lf\" y=\"%lf\" stroke=\"black\" text-anchor=\"middle\" stroke-width=\"0.3\" fill=\"black\">%s</text>\n",getX(v->ponto),getY(v->ponto),v->id);
 }
 
 void desalocaVertice(Vertice vertice){

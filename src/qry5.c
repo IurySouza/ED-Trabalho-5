@@ -24,6 +24,9 @@ int getIndex(char r[]) {
 void m(FILE* svg, char r[], char cpf[], Ponto reg[11], HashTable ht[4], Lista extraFig) {
     int index = getIndex(r);
     Endereco e = getValor(ht[0], cpf);
+    if(e == NULL){
+        return;
+    }
     Ponto p = getPontoEndereco(e);
     setX(reg[index], getX(p));
     setY(reg[index], getY(p));
@@ -138,7 +141,6 @@ void ccv(char nomeSaida[], char sufx[], Grafo grafo) {
     desalocaGrafo(arm);
     free(nomeSvg);
 }
-
 
 void descreverPath(FILE* txt, Lista path, Grafo grafo){
     No node = getLast(path);

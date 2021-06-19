@@ -124,9 +124,10 @@ void excluirVerticesIsolados(Grafo g){
             }
         }
     }
-    No node = getFirst(visitados);
+    No node = getFirst(g);
     while (node != NULL){
-        if(!strInList(visitados, getInfo(node))){
+        AdjListStruct* al = getInfo(node);
+        if(!strInList(visitados, getIdVertice(al->inicio))){
             No aux = node;
             node = getNext(node);
             removeNode(g, aux, desalocaAL);
