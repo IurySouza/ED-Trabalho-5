@@ -12,7 +12,11 @@ void cv(QuadTree qt[11], int n, char cep[], char face, int num);
 * Entrada: vetor das quadtrees, número de casos e endereço (cep, face e num)
 * Saida: void
 */
+<<<<<<< HEAD
 void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, Grafo grafo, Lista extraFig);
+=======
+void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, int num, Grafo grafo, Lista extraFig);
+>>>>>>> 037a0b02fa332584de65d058ac9e0916faaa1879
 /*
 * Obtem os k postos de antendimentos mais proximos de um endereço
 * Entrada: vetor das quadtrees, arquivos de saida txt e svg, k, lista de figuras geradas no qry e endereço (cep, face e num)
