@@ -17,6 +17,8 @@ void g(FILE* svg, char r[], Ponto reg[11], char id[], QuadTree qt[11], Lista ext
 
 void xy(FILE* svg, char r[], Ponto reg[11], double x, double y, Lista extraFig);
 
+void ccv(char nomeSaida[], char sufx[], Grafo grafo);
+
 void p(char nomeSaida[], char sufx[], QuadTree qt[11], Grafo grafo, Ponto inicio, Ponto fim, int *idPath, char cmc[], char cmr[]);
 
 void pb(char nomeSaida[], char sufx[], QuadTree qt[11], Grafo g, Ponto inicio, Ponto fim, int *idPath, char cmc[]);

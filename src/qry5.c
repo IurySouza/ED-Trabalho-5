@@ -124,6 +124,19 @@ void xy(FILE* svg, char r[], Ponto reg[11], double x, double y, Lista extraFig) 
     fprintf(svg,"\t<text id=\"%d\" x=\"%lf\" y=\"0\" fill=\"black\">%s</text>\n", *tamanho2, x,r);
 }
 
+void ccv(char nomeSaida[], char sufx[], Grafo grafo) {
+    Grafo aux = gerarGrafoNaoDirecionado(grafo);
+    Grafo arm = prim(aux);
+    char *nomeSvg = malloc(sizeof(char) * (strlen(nomeSaida) + strlen(sufx) + 6));
+    sprintf(nomeSvg, "%s-%s.svg", nomeSaida, sufx);
+    FILE* svg = iniciarSvg(nomeSvg);
+    desenharGrafo(arm, svg);
+    fecharSvg(svg);
+    desalocaGrafo(aux);
+    desalocaGrafo(arm);
+    free(nomeSvg);
+}
+
 void descreverPath(FILE* txt, Lista path, Grafo grafo){
    
 }

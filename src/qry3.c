@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "qry3.h"
 #include "lista.h"
 #include "svg.h"
 #include "verificacao.h"
@@ -47,10 +48,11 @@ void cv(QuadTree qt[11], int n, char cep[], char face, int num){
     insereQt(qt[8], getPontoCaso(caso),caso);
 }
 
-void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, int num, Lista extraFig) {
+void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, int num, Grafo grafo, Lista extraFig) {
     No node;
     Info fig;
-    double x, y, w, h;
+    double x, y, w, h, d;
+    char idi[50], idf[50];
     fig = getNodeByIdQt(qt[0],cep);
     if(fig == NULL) {
         printf("Quadra não encontrada.\n");
@@ -80,25 +82,68 @@ void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, in
         break;
     }
     Lista l = createList();
+    //Lista path = createList();
+    Vertice vi, vf, aux;
+    No ngr;
+    int i = 0;
+    ngr = getFirst(grafo);
+    while(ngr != NULL) {
+        aux = getVertice(getInfo(ngr));
+        if(i == 0) {
+            vi = aux;
+        } else {
+            double xv = getX(getPontoVertice(aux));
+            double yv = getY(getPontoVertice(aux));
+            if(distancia(x, y, xv, yv) < distancia(x, y, getX(getPontoVertice(vi)), getY(getPontoVertice(vi)))) {
+                vi = aux;
+            }
+        }
+        ngr = getNext(ngr);
+        i++;
+    }
+    strcpy(idi, getIdVertice(vi));
+
     percorreLarguraQt(qt[7],listInsert,l);
     shellSort(l, x, y);
     int* tamanho = (int*)malloc(sizeof(int));;
     *tamanho = getTamanho(extraFig);
     fprintf(svg, "\t<rect id=\"%d\" x=\"%lf\" y=\"%lf\" width=\"10\" height=\"4\" style=\"fill:blue;stroke-width:2;stroke:white\" />\n",*tamanho, x, y);
     listInsert(tamanho, extraFig);
-    int i = 0;
+    i = 0;
+    int j = 0;
     node = getFirst(l);
     while (i < k && node != NULL) {
         fig = getInfo(node);
-        tamanho = (int*)malloc(sizeof(int));
+        ngr = getFirst(grafo);
+        j = 0;
+        while(ngr != NULL) {
+            aux = getVertice(getInfo(ngr));
+            if(j == 0) {
+                vf = aux;
+            } else {
+                double xv = getX(getPontoVertice(aux));
+                double yv = getY(getPontoVertice(aux));
+                if(distancia(getX(fig), getY(fig), xv, yv) < distancia(getX(fig), getY(fig), getX(getPontoVertice(vf)), getY(getPontoVertice(vf)))) {
+                    vf = aux;
+                }
+            }
+            ngr = getNext(ngr);
+            j++;
+        }
+        strcpy(idf, getIdVertice(vf));
+        Lista path = createList();
+        path = dijkstra(grafo, idi, idf, &d, getCmpAresta);
+        int* tamanho = (int*)malloc(sizeof(int));
         *tamanho = getTamanho(extraFig);
-        fprintf(svg, "\t<line id=\"%d\" x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"%lf\" stroke=\"black\" stroke-width=\"2\" stroke-dasharray=\"5\" />\n",*tamanho, getX(fig), getY(fig), x, y);
-        listInsert(tamanho, extraFig);
+        printf("idi: %s\nidf: %s\n", idi, idf);
+        desenharPath(svg, path, grafo, *tamanho, "red");
         fprintf(txt, "x: %lf y: %lf\n", getX(fig), getY(fig));
-        node = getNext(node);
+        listInsert(tamanho, extraFig);
         i++;
+        removeList(path, free);
     }
     removeList(l,NULL);
+    //removeList(path, free);
 }
 
 void ci(FILE* svg, FILE* txt, QuadTree qt[11], HashTable ht[4], double x, double y, double r, Lista extraFig){
