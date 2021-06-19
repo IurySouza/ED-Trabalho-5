@@ -139,8 +139,7 @@ void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, Gr
             j++;
         }
         strcpy(idf, getIdVertice(vf));
-        Lista path = createList();
-        path = dijkstra(grafo, idi, idf, &d, getCmpAresta);
+        Lista path = dijkstra(grafo, idi, idf, &d, getCmpAresta);
         int* tamanho = (int*)malloc(sizeof(int));
         *tamanho = getTamanho(extraFig);
         printf("idi: %s\nidf: %s\n", idi, idf);
