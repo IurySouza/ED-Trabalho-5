@@ -257,7 +257,7 @@ void pb(char nomeSaida[], char sufx[], FILE* txt, QuadTree qt[11], Grafo g, Pont
         fprintf(txt, "Dijkstra: %s -> %s - Caminho mais curto:\n", idi, idf);
         fprintf(txt,"Distancia total: %lf\n", dmc);
         descreverPath(txt, pathMC, grafo);
-        removeList(pathMC,NULL);
+        removeList(pathMC,free);
     }
     else{
         fprintf(txt, "Não existe caminho\n");
@@ -320,13 +320,13 @@ void sp(char nomeSaida[], char sufx[], FILE* txt, QuadTree qt[11], Grafo grafo, 
     free(nomeSvg);
 }
 
-void bf(FILE* txt, FILE* svg, int max, Grafo grafo, QuadTree qt[11], Lista extraFig){
+void bf(FILE* txt, FILE* svg, int max, Grafo grafo, QuadTree qt, HashTable ht, Lista extraFig){
     HashTable norte = iniciaTabela(107);
     HashTable sul = iniciaTabela(107);
     HashTable leste = iniciaTabela(107);
     HashTable oeste = iniciaTabela(107);
     Lista casos = createList();
-    percorreLarguraQt(qt[8], listInsert, casos);
+    percorreLarguraQt(qt, listInsert, casos);
     for(No node = getFirst(casos); node != NULL; node = getNext(node)){
         char *cep = getCEPCaso(getInfo(node));
         char face = getFaceCaso(getInfo(node));
@@ -356,43 +356,40 @@ void bf(FILE* txt, FILE* svg, int max, Grafo grafo, QuadTree qt[11], Lista extra
         else{
             *total += getNCasos(getInfo(node));
         }
-        if(*total > max){
-            fprintf(txt, "CEP: %s Face: %c Numero de casos: %d\n", cep, face, *total);
-            No noAux = getNodeByIdQt(qt[3], cep);
-            if(noAux == NULL){
-                continue;
-            }
-            QuadTree q = getInfoQt(qt[3], noAux);
-            int *tamanho = (int*)malloc(sizeof(int));
-            *tamanho = getTamanho(extraFig);
-            fprintf(svg, "\t<line id=\"%d\" x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"%lf\" stroke=\"red\" stroke-width=\"4\"/>\n",*tamanho, getX(getPontoQuad(q)) + getWQuad(q) + 2, getY(getPontoQuad(q)), getX(getPontoQuad(q)) + getWQuad(q) + 2, getY(getPontoQuad(q)) + getHQuad(q));
-            listInsert(tamanho, extraFig);
-        }
     }
     for(No i = getFirst(grafo); i != NULL; i = getNext(i)){
         AdjList al = getInfo(i);
-        No j = getFirst(getListaArestas(al));
+        Ponto p1 = getPontoVertice(getVertice(al));
         HashTable esq;
         HashTable dir;
+        char faceE, faceD;
+        No j = getFirst(getListaArestas(al));
         while(j != NULL){
             Aresta a = getInfo(j);
-            Ponto p1 = getPontoVertice(getVertice(al));
             Ponto p2 = getPontoVertice(getVertice(getAdjList(grafo, getDestinoAresta(a))));
             if(getX(p2) > getX(p1) && getY(p1) == getY(p2)){
-                dir = norte;
-                esq = sul;
+                dir = sul;
+                faceD = 'S';
+                esq = norte;
+                faceE = 'N';
             }
             else if(getX(p1) > getX(p2) && getY(p1) == getY(p2)){
-                dir = sul;
-                esq = norte;
+                dir = norte;
+                faceD = 'N';
+                esq = sul;
+                faceE = 'S';
             }
             else if(getY(p2) > getY(p1) && getX(p1) == getX(p2)){
-                dir = leste;
-                esq = oeste;
+                dir = oeste;
+                faceD = 'O';
+                esq = leste;
+                faceE = 'L';
             }
             else if(getY(p1) > getY(p2) && getX(p1) == getX(p2)){
-                dir = oeste;
-                esq = leste;
+                dir = leste;
+                faceD = 'L';
+                esq = oeste;
+                faceE = 'O';
             }
             else{
                 j = getNext(j);
@@ -400,8 +397,84 @@ void bf(FILE* txt, FILE* svg, int max, Grafo grafo, QuadTree qt[11], Lista extra
             }
             int* tEsq = getValor(esq, getLesqAresta(a));
             int* tDir = getValor(dir, getLdirAresta(a));
-            if((tEsq != NULL && *tEsq > max) || (tDir != NULL && *tDir > max)){
+            if(tEsq != NULL && *tEsq > max){
                 No removido = j;
+                fprintf(txt, "CEP: %s Face: %c Numero de casos: %d\n", getLesqAresta(a), faceE, *tEsq);
+                QuadTree q = getValor(ht, getLesqAresta(a));
+                double x1, x2, y1, y2;
+                switch (faceE){
+                    case 'N':
+                        x1 = getX(getPontoQuad(q));
+                        x2 = getX(getPontoQuad(q)) + getWQuad(q);
+                        y1 = getY(getPontoQuad(q)) + getHQuad(q) + 2;
+                        y2 = getY(getPontoQuad(q)) + getHQuad(q) + 2;
+                        break;
+                    case 'S':
+                        x1 = getX(getPontoQuad(q));
+                        x2 = getX(getPontoQuad(q)) + getWQuad(q);
+                        y1 = getY(getPontoQuad(q)) - 2;
+                        y2 = getY(getPontoQuad(q)) - 2;
+                        break;
+                    case 'O':
+                        x1 = getX(getPontoQuad(q)) + getWQuad(q) + 2;
+                        x2 = getX(getPontoQuad(q)) + getWQuad(q) + 2;
+                        y1 = getY(getPontoQuad(q));
+                        y2 = getY(getPontoQuad(q)) + getHQuad(q);
+                        break;
+                    case 'L':
+                        x1 = getX(getPontoQuad(q)) - 2;
+                        x2 = getX(getPontoQuad(q)) - 2;
+                        y1 = getY(getPontoQuad(q));
+                        y2 = getY(getPontoQuad(q)) + getHQuad(q);
+                        break;
+                    default:
+                        break;
+                }
+                int *tamanho = (int*)malloc(sizeof(int));
+                *tamanho = getTamanho(extraFig);
+                fprintf(svg, "\t<line id=\"%d\" x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"%lf\" stroke=\"red\" stroke-width=\"4\"/>\n",*tamanho, x1, y1, x2, y2);
+                listInsert(tamanho, extraFig);
+                j = getNext(j);
+                removeNode(getListaArestas(al), removido, free);
+                continue;
+            }
+            if(tDir != NULL && *tDir > max){
+                No removido = j;
+                fprintf(txt, "CEP: %s Face: %c Numero de casos: %d\n", getLdirAresta(a), faceD, *tDir);
+                QuadTree q = getValor(ht, getLdirAresta(a));
+                double x1, x2, y1, y2;
+                switch (faceD){
+                    case 'N':
+                        x1 = getX(getPontoQuad(q));
+                        x2 = getX(getPontoQuad(q)) + getWQuad(q);
+                        y1 = getY(getPontoQuad(q)) + getHQuad(q) + 2;
+                        y2 = getY(getPontoQuad(q)) + getHQuad(q) + 2;
+                        break;
+                    case 'S':
+                        x1 = getX(getPontoQuad(q));
+                        x2 = getX(getPontoQuad(q)) + getWQuad(q);
+                        y1 = getY(getPontoQuad(q)) - 2;
+                        y2 = getY(getPontoQuad(q)) - 2;
+                        break;
+                    case 'O':
+                        x1 = getX(getPontoQuad(q)) + getWQuad(q) + 2;
+                        x2 = getX(getPontoQuad(q)) + getWQuad(q) + 2;
+                        y1 = getY(getPontoQuad(q));
+                        y2 = getY(getPontoQuad(q)) + getHQuad(q);
+                        break;
+                    case 'L':
+                        x1 = getX(getPontoQuad(q)) - 2;
+                        x2 = getX(getPontoQuad(q)) - 2;
+                        y1 = getY(getPontoQuad(q));
+                        y2 = getY(getPontoQuad(q)) + getHQuad(q);
+                        break;
+                    default:
+                        break;
+                }
+                int *tamanho = (int*)malloc(sizeof(int));
+                *tamanho = getTamanho(extraFig);
+                fprintf(svg, "\t<line id=\"%d\" x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"%lf\" stroke=\"red\" stroke-width=\"4\"/>\n",*tamanho, x1, y1, x2, y2);
+                listInsert(tamanho, extraFig);
                 j = getNext(j);
                 removeNode(getListaArestas(al), removido, free);
                 continue;

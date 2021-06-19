@@ -358,7 +358,7 @@ void qry(QuadTree qt[11], HashTable ht[4], Grafo grafo, char path[], char nomeSa
         else if(strcmp(tipo, "bf") == 0) {
             fscanf(consulta, "%d", &i);
             fprintf(saida, "%s %d\n", tipo, i);
-            bf(saida, svg, i, grafo, qt, extraFig);
+            bf(saida, svg, i, grafo, qt[8], ht[3], extraFig);
         }
         else if(strcmp(tipo, "sp?") == 0) {
             fscanf(consulta, "%s %s %s %s %s", aux, r1, r2, corb, corp);

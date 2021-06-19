@@ -35,6 +35,6 @@ void pb(char nomeSaida[], char sufx[], FILE* txt, QuadTree qt[11], Grafo g, Pont
 void sp(char nomeSaida[], char sufx[], FILE* txt, QuadTree qt[11], Grafo grafo, Ponto inicio, Ponto fim, int *idPath, char cmc[], char cmr[]);
 
 //Deleta arestas pertos de quadras com mais que max casos de covid
-void bf(FILE* txt, FILE* svg, int max, Grafo grafo, QuadTree qt[11], Lista extraFig);
+void bf(FILE* txt, FILE* svg, int max, Grafo grafo, QuadTree qt, HashTable ht, Lista extraFig);
 
 #endif
