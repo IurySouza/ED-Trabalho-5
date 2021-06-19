@@ -9,6 +9,8 @@
 #include "instrumentoUrbano.h"
 #include "verificacao.h"
 #include "svg.h"
+#include "casos.h"
+#include "sorts.h"
 
 int getIndex(char r[]) {
     char* rAux = malloc((strlen(r) + 1) * sizeof(char));
@@ -135,17 +137,45 @@ void ccv(char nomeSaida[], char sufx[], Grafo grafo) {
     desalocaGrafo(aux);
     desalocaGrafo(arm);
     free(nomeSvg);
+<<<<<<< HEAD
 }
 
 void descreverPath(FILE* txt, Lista path, Grafo grafo){
    
+=======
+>>>>>>> cf94275d7bc03308803a37ff430a5b1c830cbf54
 }
 
-void p(char nomeSaida[], char sufx[], QuadTree qt[11], Grafo grafo, Ponto inicio, Ponto fim, int *idPath, char cmc[], char cmr[]){
-    if(getFirst(grafo) == NULL){
-        printf("grafo vazio\n");
-        return;
+
+void descreverPath(FILE* txt, Lista path, Grafo grafo){
+    No node = getLast(path);
+    AdjList al1 = getAdjList(grafo, getInfo(node));
+    for(node = getPrevious(node); node != NULL; node = getPrevious(node)){
+        AdjList al2 = getAdjList(grafo, getInfo(node));
+        Ponto p1 = getPontoVertice(getVertice(al1));
+        Ponto p2 = getPontoVertice(getVertice(al2));
+        Aresta a = getArestaByDest(al1, getInfo(node));
+        fprintf(txt,"Siga a rua %s", getNomeAresta(a));
+        if(getX(p2) > getX(p1) && getY(p1) == getY(p2)){
+            fprintf(txt, " na direção oeste\n");
+        }
+        else if(getX(p1) > getX(p2) && getY(p1) == getY(p2)){
+            fprintf(txt, " na direção leste\n");
+        }
+        else if(getY(p2) > getY(p1) && getX(p1) == getX(p2)){
+            fprintf(txt, " na direção norte\n");
+        }
+        else if(getY(p1) > getY(p2) && getX(p1) == getX(p2)){
+            fprintf(txt, " na direção sul\n");
+        }
+        else{
+            fprintf(txt, "\n");
+        }
+        al1 = al2;
     }
+}
+
+void p(FILE* svg, FILE* txt, QuadTree qt[11], Grafo grafo, Ponto inicio, Ponto fim, int *idPath, char cmc[], char cmr[]){
     Vertice vi = getVertice(getInfo(getFirst(grafo)));
     Vertice vf = getVertice(getInfo(getFirst(grafo)));
     char idi[50], idf[50];
@@ -166,32 +196,41 @@ void p(char nomeSaida[], char sufx[], QuadTree qt[11], Grafo grafo, Ponto inicio
             df = dAux;
         }
     }
-    char *nomeSvg = malloc(sizeof(char) * (strlen(nomeSaida) + strlen(sufx) + 6));
-    char *nomeTxt = malloc(sizeof(char) * (strlen(nomeSaida) + strlen(sufx) + 6));
-    sprintf(nomeSvg,"%s-%s.svg", nomeSaida, sufx);
-    sprintf(nomeTxt,"%s-%s.txt", nomeSaida, sufx);
-    FILE* svg = iniciarSvg(nomeSvg);
-    FILE* txt = fopen(nomeTxt, "w");
     double dmc, dmr;
     Lista pathMC = dijkstra(grafo, idi, idf, &dmc, getCmpAresta);
     Lista pathMR = dijkstra(grafo, idi, idf, &dmr, getTempoAresta);
     if(pathMC != NULL && pathMR != NULL){
         desenharSvg(svg, qt, NULL);
         desenharPath(svg, pathMC, grafo, ++(*idPath), cmc);
+        fprintf(txt, "Dijkstra: %s -> %s - Caminho mais curto:\n", idi, idf);
+        fprintf(txt,"Distancia total: %lf\n", dmc);
+        descreverPath(txt, pathMC, grafo);
+        fprintf(txt, "Dijkstra: %s -> %s - Caminho mais rapido:\n", idi, idf);
+        fprintf(txt,"Tempo total: %lf\n", dmr);
         desenharPath(svg, pathMR, grafo, ++(*idPath), cmr);
+        descreverPath(txt, pathMR, grafo);
         removeList(pathMC,free);
         removeList(pathMR,free);
     }
     else{
         fprintf(txt, "Não existe caminho\n");
     }
-    fecharSvg(svg);
-    fclose(txt);
-    free(nomeSvg);
-    free(nomeTxt);
 }
 
-void pb(char nomeSaida[], char sufx[], QuadTree qt[11], Grafo g, Ponto inicio, Ponto fim, int *idPath, char cmc[]){
+void pInit(char nomeSaida[], char sufx[], FILE* txt, QuadTree qt[11], Grafo grafo, Ponto inicio, Ponto fim, int *idPath, char cmc[], char cmr[]){
+    if(getFirst(grafo) == NULL){
+        printf("grafo vazio\n");
+        return;
+    }
+    char *nomeSvg = malloc(sizeof(char) * (strlen(nomeSaida) + strlen(sufx) + 6));
+    sprintf(nomeSvg,"%s-%s.svg", nomeSaida, sufx);
+    FILE* svg = iniciarSvg(nomeSvg);
+    p(svg,txt, qt, grafo, inicio, fim, idPath, cmc, cmr);
+    fecharSvg(svg);
+    free(nomeSvg);
+}
+
+void pb(char nomeSaida[], char sufx[], FILE* txt, QuadTree qt[11], Grafo g, Ponto inicio, Ponto fim, int *idPath, char cmc[]){
     Grafo gnd = gerarGrafoNaoDirecionado(g);
     Grafo grafo = prim(gnd);    
     Vertice vi = getFirst(getVertice(getFirst(grafo)));
@@ -215,17 +254,16 @@ void pb(char nomeSaida[], char sufx[], QuadTree qt[11], Grafo g, Ponto inicio, P
         }
     }
     char *nomeSvg = malloc(sizeof(char) * (strlen(nomeSaida) + strlen(sufx) + 6));
-    char *nomeTxt = malloc(sizeof(char) * (strlen(nomeSaida) + strlen(sufx) + 6));
     sprintf(nomeSvg,"%s-%s.svg", nomeSaida, sufx);
-    sprintf(nomeTxt,"%s-%s.txt", nomeSaida, sufx);
     FILE* svg = iniciarSvg(nomeSvg);
-    FILE* txt = fopen(nomeTxt, "w");
     double dmc;
     Lista pathMC = dijkstra(grafo, idi, idf, &dmc, getCmpAresta);
     if(pathMC != NULL){
         desenharSvg(svg, qt, NULL);
         desenharPath(svg, pathMC, grafo, ++(*idPath), cmc);
-        //descrever
+        fprintf(txt, "Dijkstra: %s -> %s - Caminho mais curto:\n", idi, idf);
+        fprintf(txt,"Distancia total: %lf\n", dmc);
+        descreverPath(txt, pathMC, grafo);
         removeList(pathMC,NULL);
     }
     else{
@@ -234,7 +272,154 @@ void pb(char nomeSaida[], char sufx[], QuadTree qt[11], Grafo g, Ponto inicio, P
     desalocaGrafo(gnd);
     desalocaGrafo(grafo);
     fecharSvg(svg);
-    fclose(txt);
     free(nomeSvg);
-    free(nomeTxt);
+}
+
+void sp(char nomeSaida[], char sufx[], FILE* txt, QuadTree qt[11], Grafo grafo, Ponto inicio, Ponto fim, int *idPath, char cmc[], char cmr[]){
+    if(getFirst(grafo) == NULL){
+        printf("grafo vazio\n");
+        return;
+    }
+    Lista casos = createList();
+    Lista env = NULL;
+    percorreLarguraQt(qt[8], listInsert, casos);
+    if(getTamanho(casos) > 2){
+        env = convexHull(casos, getPontoCaso, swapCasos);
+    }
+    removeList(casos, NULL);
+    if(env == NULL){
+        return;
+    }
+    Lista vDentro = createList();
+    for(No node = getFirst(grafo); node != NULL; node = getNext(node)){
+        Vertice v = getVertice(getInfo(node));
+        if(insidePolygon(env, getPontoVertice(v))){
+            listInsert(getIdVertice(v), vDentro);
+        }
+    }
+    Grafo aux = createGrafo();
+    for(No i = getFirst(grafo); i != NULL; i = getNext(i)){
+        AdjList al = getInfo(i);
+        if(!strInList(vDentro, getIdVertice(getVertice(al)))){
+            adicionarVertice(aux, copyVertice(getVertice(al)));
+            for(No j = getFirst(getListaArestas(al)); j != NULL; j = getNext(j)){
+                Aresta a = getInfo(j);
+                if(!strInList(vDentro, getDestinoAresta(a))){
+                    adicionarAresta(aux, getIdVertice(getVertice(al)), copyAresta(a, getDestinoAresta(a)));
+                }
+            }
+        }
+    }
+    char *nomeSvg = malloc(sizeof(char) * (strlen(nomeSaida) + strlen(sufx) + 6));
+    sprintf(nomeSvg,"%s-%s.svg", nomeSaida, sufx);
+    FILE* svg = iniciarSvg(nomeSvg);
+    p(svg, txt, qt, aux, inicio, fim, idPath, cmc, cmr);
+    fprintf(svg,"\t<polygon  fill=\"yellow\" fill-opacity=\"0.6\" points=\"");
+    for(No node = getFirst(env); node != NULL; node = getNext(node)){
+        Ponto fig = getInfo(node);
+        fprintf(svg," %lf,%lf",getX(fig),getY(fig));
+    }
+    fprintf(svg," \"/>\n");
+    removeList(env, NULL);
+    removeList(vDentro,NULL);
+    desalocaGrafo(aux);
+    fecharSvg(svg);
+    free(nomeSvg);
+}
+
+void bf(FILE* txt, FILE* svg, int max, Grafo grafo, QuadTree qt[11], Lista extraFig){
+    HashTable norte = iniciaTabela(107);
+    HashTable sul = iniciaTabela(107);
+    HashTable leste = iniciaTabela(107);
+    HashTable oeste = iniciaTabela(107);
+    Lista casos = createList();
+    percorreLarguraQt(qt[8], listInsert, casos);
+    for(No node = getFirst(casos); node != NULL; node = getNext(node)){
+        char *cep = getCEPCaso(getInfo(node));
+        char face = getFaceCaso(getInfo(node));
+        HashTable aux;
+        switch (face){
+            case 'N':
+                aux = norte;
+                break;
+            case 'S':
+                aux = sul;
+                break;
+            case 'O':
+                aux = oeste;
+                break;
+            case 'L':
+                aux = leste;
+                break;
+            default:
+                break;
+        }
+        int *total = getValor(aux, cep); 
+        if(total == NULL){
+            total = malloc(sizeof(int));
+            *total = getNCasos(getInfo(node));
+            adicionaItem(aux, cep, total);
+        }
+        else{
+            *total += getNCasos(getInfo(node));
+        }
+        if(*total > max){
+            fprintf(txt, "CEP: %s Face: %c Numero de casos: %d\n", cep, face, *total);
+            No noAux = getNodeByIdQt(qt[3], cep);
+            if(noAux == NULL){
+                continue;
+            }
+            QuadTree q = getInfoQt(qt[3], noAux);
+            int *tamanho = (int*)malloc(sizeof(int));
+            *tamanho = getTamanho(extraFig);
+            fprintf(svg, "\t<line id=\"%d\" x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"%lf\" stroke=\"red\" stroke-width=\"4\"/>\n",*tamanho, getX(getPontoQuad(q)) + getWQuad(q) + 2, getY(getPontoQuad(q)), getX(getPontoQuad(q)) + getWQuad(q) + 2, getY(getPontoQuad(q)) + getHQuad(q));
+            listInsert(tamanho, extraFig);
+        }
+    }
+    for(No i = getFirst(grafo); i != NULL; i = getNext(i)){
+        AdjList al = getInfo(i);
+        No j = getFirst(getListaArestas(al));
+        HashTable esq;
+        HashTable dir;
+        while(j != NULL){
+            Aresta a = getInfo(j);
+            Ponto p1 = getPontoVertice(getVertice(al));
+            Ponto p2 = getPontoVertice(getVertice(getAdjList(grafo, getDestinoAresta(a))));
+            if(getX(p2) > getX(p1) && getY(p1) == getY(p2)){
+                dir = norte;
+                esq = sul;
+            }
+            else if(getX(p1) > getX(p2) && getY(p1) == getY(p2)){
+                dir = sul;
+                esq = norte;
+            }
+            else if(getY(p2) > getY(p1) && getX(p1) == getX(p2)){
+                dir = leste;
+                esq = oeste;
+            }
+            else if(getY(p1) > getY(p2) && getX(p1) == getX(p2)){
+                dir = oeste;
+                esq = leste;
+            }
+            else{
+                j = getNext(j);
+                continue;
+            }
+            int* tEsq = getValor(esq, getLesqAresta(a));
+            int* tDir = getValor(dir, getLdirAresta(a));
+            if((tEsq != NULL && *tEsq > max) || (tDir != NULL && *tDir > max)){
+                No removido = j;
+                j = getNext(j);
+                removeNode(getListaArestas(al), removido, free);
+                continue;
+            }
+            j = getNext(j);
+        }
+    }
+    excluirVerticesIsolados(grafo);
+    removeList(casos, NULL);
+    deletaTabela(norte, 1);
+    deletaTabela(sul,1);
+    deletaTabela(leste,1);
+    deletaTabela(oeste,1);
 }

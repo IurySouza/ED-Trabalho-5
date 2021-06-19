@@ -208,19 +208,43 @@ void catac(FILE *svg, FILE *txt, QuadTree qt[11], HashTable ht[4], Grafo grafo, 
 
     node = getFirst(grafo);
     fprintf(txt, "Vertices:\n");
+    Lista vDentro = createList();
     while(node != NULL){
         Vertice v = getVertice(getInfo(node));
         double xv = getX(getPontoVertice(v));
         double yv = getY(getPontoVertice(v));
         if(pontoInternoCirc(xv, yv, x, y, r)){
-            No removido = node;
-            node = getNext(node);
             fprintf(txt, "Vertice: %s; x=%lf; y=%lf\n", getIdVertice(v), xv, yv);
-            removeNode(grafo, removido, desalocaAL);
-            continue;
+            char* auxS = malloc(sizeof(char) * (strlen(getIdVertice(v)) + 1));
+            strcpy(auxS, getIdVertice(v));
+            listInsert(auxS, vDentro);
         }
         node = getNext(node);
     }
+    No i = getFirst(grafo);
+    while(i != NULL){
+        AdjList al = getInfo(i);
+        if(strInList(vDentro, getIdVertice(getVertice(al)))){
+            No removido = i;
+            i = getNext(i);
+            removeNode(grafo, removido, desalocaAL);
+            continue;
+        }
+        No j = getFirst(getListaArestas(al));
+        while(j != NULL){
+            Aresta a = getInfo(j);
+            if(strInList(vDentro, getDestinoAresta(a))){
+                No removido = j;
+                j = getNext(j);
+                removeNode(getListaArestas(al), removido, free);
+                continue;
+            }
+            j = getNext(j);
+        }
+        i = getNext(i);
+    }
+    excluirVerticesIsolados(grafo);
+    removeList(vDentro,free);
 
     l = nosDentroCirculoQt(qt[0], x, y, r);
     fprintf(txt, "Quadras:\n");

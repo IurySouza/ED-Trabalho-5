@@ -28,4 +28,7 @@ Info getIndexInfo(Lista list, int i);
 void balancearQuadTree(QuadTree qt, Lista l, void* (*getPonto)(void*), void (*swap)(void*, void*));
 //adiciona os elementos da lista l na quadtree qt, utilizando o algoritmo da envoltória convexa para gerar uma quadtree balanceada 
 
+int insidePolygon(Lista pontos, Ponto ponto);
+//verifica se um ponto é interno a um poligono com pontos armazenados em uma lista no sentido anti-horario
+
 #endif

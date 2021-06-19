@@ -267,7 +267,11 @@ void qry(QuadTree qt[11], HashTable ht[4], Grafo grafo, char path[], char nomeSa
         else if(strcmp(tipo,"soc") == 0){
             fscanf(consulta,"%d %s %c %d", &i, cepid ,&face, &j);
             fprintf(saida,"%s %d %s %c %d\n",tipo, i, cepid ,face, j);
+<<<<<<< HEAD
             soc(svg,saida,qt,i,cepid,face,j,grafo,extraFig);
+=======
+            soc(svg,saida,qt,i,cepid,face, grafo, extraFig);
+>>>>>>> cf94275d7bc03308803a37ff430a5b1c830cbf54
         }
         else if(strcmp(tipo,"ci") == 0){
             fscanf(consulta,"%lf %lf %lf", &x, &y, &h);
@@ -322,8 +326,14 @@ void qry(QuadTree qt[11], HashTable ht[4], Grafo grafo, char path[], char nomeSa
             m(svg, r1, cpf, reg, ht, extraFig);
         }
         else if(strcmp(tipo, "@e?") == 0) {
-            fscanf(consulta, "%s %s %c %d", r1, cepid, &face, &j);
-            fprintf(saida, "%s %s %s %c %d\n", tipo, r1, cepid, face, j);
+            fscanf(consulta, "%s %s %s %d", r1, cepid, aux, &j);
+            fprintf(saida, "%s %s %s %s %d\n", tipo, r1, cepid, aux, j);
+            if(strlen(aux) == 1){
+                face = aux[0];
+            }
+            else{    
+                face = aux[strlen(aux) - 1];
+            }
             e(svg, r1, cepid, face, j, reg, ht, extraFig);
         }
         else if(strcmp(tipo, "@g?") == 0) {
@@ -339,7 +349,7 @@ void qry(QuadTree qt[11], HashTable ht[4], Grafo grafo, char path[], char nomeSa
         else if(strcmp(tipo, "ccv") == 0) {
             fscanf(consulta, "%s", aux);
             fprintf(saida, "%s %s\n", tipo, aux);
-            // ccv();
+            ccv(nomeSaida, aux, grafo);
         }
         else if(strcmp(tipo, "p?") == 0) {
             fscanf(consulta, "%s %s %s %s %s", aux, r1, r2, corb, corp);
@@ -347,22 +357,22 @@ void qry(QuadTree qt[11], HashTable ht[4], Grafo grafo, char path[], char nomeSa
             if(strcmp(aux,"-") != 0){
                 strcpy(sufx, aux);
             }
-            p(nomeSaida, sufx, qt, grafo, reg[getIndex(r1)], reg[getIndex(r2)], &idPath, corb, corp);
+            pInit(nomeSaida, sufx, saida, qt, grafo, reg[getIndex(r1)], reg[getIndex(r2)], &idPath, corb, corp);
         }
         else if(strcmp(tipo, "bf") == 0) {
-            fscanf(consulta, "%s", r1);
-            fprintf(saida, "%s %s\n", tipo, r1);
-            // bf();
+            fscanf(consulta, "%d", &i);
+            fprintf(saida, "%s %d\n", tipo, i);
+            bf(saida, svg, i, grafo, qt, extraFig);
         }
         else if(strcmp(tipo, "sp?") == 0) {
             fscanf(consulta, "%s %s %s %s %s", aux, r1, r2, corb, corp);
             fprintf(saida, "%s %s %s %s %s %s\n", tipo, aux, r1, r2, corb, corp);
-            // sp();
+            sp(nomeSaida, sufx, saida, qt, grafo, reg[getIndex(r1)], reg[getIndex(r2)], &idPath, corb, corp);
         }
         else if(strcmp(tipo, "pb?") == 0) {
             fscanf(consulta, "%s %s %s %s", aux, r1, r2, corb);
             fprintf(saida, "%s %s %s %s %s\n", tipo, aux, r1, r2, corb);
-            // pb();
+            pb(nomeSaida, sufx, saida, qt, grafo, reg[getIndex(r1)], reg[getIndex(r2)], &idPath, corb);
         }
     }
     for(int i = 0; i < 11; i++) {

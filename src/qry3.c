@@ -12,6 +12,8 @@
 #include "ponto.h"
 #include "circulo.h"
 #include "tabelaEspalhamento.h"
+#include "vertice.h"
+#include "aresta.h"
 
 void cv(QuadTree qt[11], int n, char cep[], char face, int num){
     Info fig;
@@ -29,26 +31,22 @@ void cv(QuadTree qt[11], int n, char cep[], char face, int num){
         w = getWQuad(fig);
     }
     switch (face){
-    case 'n':
-        x += num;
+    case 'N':
         y += h;
         break;
-    case 's':
-        x += num;
-        break;
-    case 'l':
-        y += num;
-        break;
-    case 'o':
+    case 'O':
         x += w;
-        y += num;
         break;
     }
     CasosCovid caso = createCasos(x,y,cep,face,num,n);
     insereQt(qt[8], getPontoCaso(caso),caso);
 }
 
+<<<<<<< HEAD
 void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, int num, Grafo grafo, Lista extraFig) {
+=======
+void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, Grafo grafo, Lista extraFig) {
+>>>>>>> cf94275d7bc03308803a37ff430a5b1c830cbf54
     No node;
     Info fig;
     double x, y, w, h, d;
@@ -66,28 +64,25 @@ void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, in
         w = getWQuad(fig);
     }
     switch(face) {
-    case 'n':
-        x += num;
+    case 'N':
         y += h;
         break;
-    case 's':
-        x += num;
-        break;
-    case 'l':
-        y += num;
-        break;
-    case 'o':
+    case 'O':
         x += w;
-        y += num;
         break;
     }
     Lista l = createList();
+<<<<<<< HEAD
     //Lista path = createList();
+=======
+    Lista path = createList();
+>>>>>>> cf94275d7bc03308803a37ff430a5b1c830cbf54
     Vertice vi, vf, aux;
     No ngr;
     int i = 0;
     ngr = getFirst(grafo);
     while(ngr != NULL) {
+<<<<<<< HEAD
         aux = getVertice(getInfo(ngr));
         if(i == 0) {
             vi = aux;
@@ -96,6 +91,16 @@ void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, in
             double yv = getY(getPontoVertice(aux));
             if(distancia(x, y, xv, yv) < distancia(x, y, getX(getPontoVertice(vi)), getY(getPontoVertice(vi)))) {
                 vi = aux;
+=======
+        //aux = getVertice(getInfo(node));
+        if(i == 0) {
+            vi = ngr;
+        } else {
+            double xv = getX(getPontoVertice(ngr));
+            double yv = getY(getPontoVertice(ngr));
+            if(distancia(x, y, xv, yv) < distancia(x, y, getX(getPontoVertice(vi)), getY(getPontoVertice(vi)))) {
+                vi = ngr;
+>>>>>>> cf94275d7bc03308803a37ff430a5b1c830cbf54
             }
         }
         ngr = getNext(ngr);
@@ -110,7 +115,10 @@ void soc(FILE* svg, FILE* txt, QuadTree qt[11], int k, char cep[], char face, in
     fprintf(svg, "\t<rect id=\"%d\" x=\"%lf\" y=\"%lf\" width=\"10\" height=\"4\" style=\"fill:blue;stroke-width:2;stroke:white\" />\n",*tamanho, x, y);
     listInsert(tamanho, extraFig);
     i = 0;
+<<<<<<< HEAD
     int j = 0;
+=======
+>>>>>>> cf94275d7bc03308803a37ff430a5b1c830cbf54
     node = getFirst(l);
     while (i < k && node != NULL) {
         fig = getInfo(node);
